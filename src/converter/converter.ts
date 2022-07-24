@@ -174,7 +174,7 @@ export class Converter {
             const y: number = Number(container.style.top.replace("px","")) || 0;
             const image: HTMLImageElement = (container.getElementsByClassName("WACImage") as HTMLCollectionOf<HTMLImageElement>)[0];
             const image_boundaries = image.getBoundingClientRect();
-            const data = image.src.replace("data:image/png;base64,", "");
+            const data = image.src.replace(new RegExp("data:image/.*;base64,"), "");
             const width = image.width;
             const height = image.height;
 
