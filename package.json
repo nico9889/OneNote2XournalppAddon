@@ -1,6 +1,6 @@
 {
   "name": "onenote2xournalpp-addon",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "One-click browser addon to convert OneNote notes to Xournal++ compatible format",
   "scripts": {
     "build": "webpack --config webpack/webpack.config.js",

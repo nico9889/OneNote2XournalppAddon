@@ -7,7 +7,7 @@ module.exports = {
     mode: "production",
     entry: {
         onenote2xournalpp: path.resolve(__dirname, "..", "src", "onenote2xournalpp.ts"),
-        content: path.resolve(__dirname, "..", "src", "content.ts")
+        content: path.resolve(__dirname, "..", "src", "converter.ts")
     },
     output: {
         path: path.join(__dirname, "../dist"),
