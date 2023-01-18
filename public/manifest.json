@@ -9,9 +9,10 @@
     "activeTab",
     "scripting"
   ],
+  "host_permissions": ["*://onedrive.live.com/*","*://onenote.officeapps.live.com/*"],
   "content_scripts": [
     {
-      "matches": ["*://onenote.officeapps.live.com/*"],
+      "matches": ["*://onedrive.live.com/*","*://onenote.officeapps.live.com/*"],
       "all_frames": true,
       "js": ["content.js"]
     }
@@ -26,6 +27,6 @@
     "default_title": "Convert to Xournal++"
   },
   "background": {
-    "service_worker": "onenote2xournalpp.js"
+    "scripts": ["onenote2xournalpp.js"]
   }
 }
