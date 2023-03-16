@@ -1,6 +1,8 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack')
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 
 module.exports = {
@@ -22,8 +24,14 @@ module.exports = {
                 test: /\.tsx?$/,
                 loader: "ts-loader",
                 exclude: /node_modules/,
-            },
+            },{
+                test: /.s?css$/,
+                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+            }
         ],
+    },
+    optimization: {
+        minimizer: [new CssMinimizerPlugin()]
     },
     plugins: [
         new CopyPlugin({
@@ -31,6 +39,7 @@ module.exports = {
         }),
         new webpack.ProvidePlugin({
             browser: "webextension-polyfill"
-        })
+        }),
+
     ],
 };
