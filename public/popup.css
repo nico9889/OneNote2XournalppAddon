@@ -1,0 +1,130 @@
+:root{
+    --light: rgb(241, 244, 248);
+    --dark: rgb(33, 37, 41);
+    --grey:rgb(66, 74, 82);
+}
+
+body{
+    font-family: sans-serif;
+    text-align: center;
+}
+
+.m-3{
+    margin: 1rem;
+}
+
+.m-auto{
+    margin: auto;
+}
+
+.my-3{
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+}
+
+.px-1{
+    padding-right: 0.25rem !important;
+    padding-left: 0.25rem !important;
+}
+
+.container{
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+hr{
+    width: 100%;
+}
+
+h4{
+    margin: 0;
+}
+
+.btn{
+    border: transparent;
+    background: transparent;
+    margin: 0.25rem auto;
+    width: max-content;
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    box-shadow: 0 0 0.5rem 0 rgba(0,0,0,0.4);
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.btn:hover{
+    background: blueviolet;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 0.25rem 0.5rem 0 rgba(0,0,0,0.4);
+}
+
+.border-color{
+    border: solid blueviolet;
+    border-radius: 0.25rem;
+}
+
+.file-name{
+    padding: 1rem;
+}
+
+.additional-options{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.text-muted{
+    color: var(--grey);
+}
+
+.row{
+    display: flex;
+    flex-direction: row;
+}
+
+.col{
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+}
+
+.form-checkbox{
+    margin: 0.5rem;
+}
+
+label.checkbox-text{
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.text-default{
+    color: var(--dark);
+}
+
+.footer{
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root{
+        --grey: rgb(132, 148, 164);
+    }
+
+    .text-default{
+        color: var(--light);
+    }
+
+    body{
+        color: var(--light);
+        background: var(--dark);
+    }
+
+    .btn {
+        color: var(--light);
+    }
+}

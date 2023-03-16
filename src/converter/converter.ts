@@ -31,7 +31,7 @@ export class Converter {
         return this.instance;
     }
 
-    convertStrokes(additional?: {max_width: number, max_height: number}): Stroke[]{
+    convertStrokes(additional?: { max_width: number, max_height: number }): Stroke[] {
         const converted_strokes: Stroke[] = [];
         const strokes = document.getElementsByClassName("InkStrokeOuterElement") as HTMLCollectionOf<SVGElement>;
         console.debug("O2X: Converting strokes");
@@ -40,7 +40,7 @@ export class Converter {
 
             // Inelegant solution to export strokes max_width and max_height by side effect without
             // scanning multiple times all the strokes
-            if(additional){
+            if (additional) {
                 additional.max_width = Math.max(additional.max_width, strokeBoundaries.x + strokeBoundaries.width);
                 additional.max_height = Math.max(additional.max_height, strokeBoundaries.y + strokeBoundaries.height);
             }
@@ -88,8 +88,8 @@ export class Converter {
                         stroke.color = color;
 
                         // If the opacity is < 1, we suppose that the stroke is made with highlighter since there's seems to be
-                        // no other notation to distinguish an highlighter by a pen
-                        if(opacity < 1){
+                        // no other notation to distinguish a highlighter by a pen
+                        if (opacity < 1) {
                             stroke.tool = Tool.Highlighter;
                         }
                         converted_strokes.push(stroke);
@@ -128,8 +128,12 @@ export class Converter {
         }
         return converted_strokes;
     }
-    
-    convertTexts(offset_x: number, offset_y: number, additional?: {max_width: number, max_height: number}): Text[]{
+
+    #sanitize(text: string): string {
+        return text.replace(/[^a-zA-Z0-9 ]+/, '') || "OneNote";
+    }
+
+    convertTexts(offset_x: number, offset_y: number, additional?: { max_width: number, max_height: number }): Text[] {
         const texts = document.getElementsByClassName("TextRun") as HTMLCollectionOf<HTMLSpanElement>;
         const converted_texts: Text[] = [];
         console.debug("O2X: Converting texts");
@@ -150,7 +154,7 @@ export class Converter {
 
                 // Inelegant solution to export texts max_width and max_height by side effect without
                 // scanning multiple times all the texts
-                if(additional){
+                if (additional) {
                     additional.max_width = Math.max(additional.max_width, converted_text.x + textBoundaries.width);
                     additional.max_height = Math.max(additional.max_height, converted_text.y + textBoundaries.height);
                 }
@@ -159,8 +163,8 @@ export class Converter {
         }
         return converted_texts;
     }
-    
-    convertImages(offset_x: number, offset_y: number, additional?: {max_width: number, max_height: number}): Image[]{
+
+    convertImages(offset_x: number, offset_y: number, additional?: { max_width: number, max_height: number }): Image[] {
         const converted_images: Image[] = [];
         const image_containers = document.getElementsByClassName("WACImageContainer") as HTMLCollectionOf<HTMLDivElement>;
         console.debug("O2X: Converting images");
@@ -170,8 +174,8 @@ export class Converter {
             // Relative: the image is shifted by an offset from the main WACViewPanel.
             // We try first with the absolute position, if it's not found we try to calculate the relative position,
             // converting it to an (hopefully correct) absolute one
-            const x: number = Number(container.style.left.replace("px","")) || 0;
-            const y: number = Number(container.style.top.replace("px","")) || 0;
+            const x: number = Number(container.style.left.replace("px", "")) || 0;
+            const y: number = Number(container.style.top.replace("px", "")) || 0;
             const image: HTMLImageElement = (container.getElementsByClassName("WACImage") as HTMLCollectionOf<HTMLImageElement>)[0];
             const image_boundaries = image.getBoundingClientRect();
             const data = image.src.replace(new RegExp("data:image/.*;base64,"), "");
@@ -183,16 +187,16 @@ export class Converter {
 
             // Inelegant solution to export images max_width and max_height by side effect without
             // scanning multiple times all the images
-            if(additional){
+            if (additional) {
                 additional.max_width = Math.max(additional.max_width, converted_image.right);
                 additional.max_height = Math.max(additional.max_height, image_boundaries.bottom);
             }
-            
+
         }
         return converted_images
     }
 
-    convert() {
+    convert(strokes: boolean, images: boolean, texts: boolean, separateLayers: boolean) {
         // Page dimensions
         const dimension = {
             max_width: 0,
@@ -206,11 +210,11 @@ export class Converter {
             return;
         }
         const panel_boundaries = panel.getBoundingClientRect();
-        
-        const converted_texts: Text[] = this.convertTexts(panel_boundaries.x, panel_boundaries.y, dimension);
-        const converted_images: Image[] = this.convertImages(panel_boundaries.x, panel_boundaries.y, dimension);
-        const converted_strokes: Stroke[] = this.convertStrokes(dimension)
-        
+
+        const converted_texts: Text[] = (texts) ? this.convertTexts(panel_boundaries.x, panel_boundaries.y, dimension) : [];
+        const converted_images: Image[] = (images)? this.convertImages(panel_boundaries.x, panel_boundaries.y, dimension) : [];
+        const converted_strokes: Stroke[] = (strokes) ? this.convertStrokes(dimension) : [];
+
         console.debug("O2X: Assembling document");
         const exportDoc = new Document(document.title);
         const page = new Page();
@@ -218,17 +222,25 @@ export class Converter {
         page.height = dimension.max_height + 5;
         page.width = dimension.max_width + 5;
 
-        // To simplify the edit of the exported document different layers are used for different elements
-        const images_layer = new Layer();
-        images_layer.images = converted_images;
-        const texts_layer = new Layer();
-        texts_layer.texts = converted_texts;
-        const strokes_layer = new Layer();
-        strokes_layer.strokes = converted_strokes;
+        if(separateLayers){
+            // To simplify the edit of the exported document different layers are used for different elements
+            const images_layer = new Layer();
+            images_layer.images = converted_images;
+            const texts_layer = new Layer();
+            texts_layer.texts = converted_texts;
+            const strokes_layer = new Layer();
+            strokes_layer.strokes = converted_strokes;
+            page.layers.push(images_layer);
+            page.layers.push(texts_layer);
+            page.layers.push(strokes_layer);
+        }else{
+            const layer = new Layer();
+            layer.images = converted_images;
+            layer.texts = converted_texts;
+            layer.strokes = converted_strokes;
+            page.layers.push(layer);
+        }
 
-        page.layers.push(images_layer);
-        page.layers.push(texts_layer);
-        page.layers.push(strokes_layer);
         exportDoc.pages.push(page);
 
         console.debug("O2X: Preparing document to exportation");
@@ -241,15 +253,25 @@ export class Converter {
         const url = URL.createObjectURL(blob);
         this.pom = document.createElement("a");
         this.pom.setAttribute('href', url);
-        this.pom.setAttribute('download', document.title + ".xopp");
     }
 
-    download() {
-        if(this.pom){
-            this.pom?.click();
-        }else{
-            console.error("No file has been converted. Cannot export");
+    download(filename: string) {
+        let title = filename;
+        if (!title) {
+            const titles = document.getElementsByClassName("Title GrowUnderline");
+            if (titles) {
+                const spans = titles[0].getElementsByTagName("span");
+                const titleSpan = spans[0];
+                title = titleSpan.textContent ?? "OneNote";
+            }
         }
 
+        if (!this.pom) {
+            console.error("No file has been converted. Cannot export");
+            return;
+        }
+
+        this.pom.setAttribute('download', `${this.#sanitize(title)}.xopp`);
+        this.pom?.click();
     }
 }
