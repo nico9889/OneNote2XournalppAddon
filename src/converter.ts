@@ -1,12 +1,10 @@
 import browser from "webextension-polyfill";
 import {Converter} from "./converter/converter";
 
-export function convert(filename: string, strokes: boolean, images: boolean, texts: boolean, separateLayers: boolean){
-    if(document.documentURI.startsWith("https://onenote.officeapps.live.com")){
-        const converter: Converter = Converter.build()
-        converter.convert(strokes, images, texts, separateLayers);
-        converter.download(filename);
-    }
+function convert(filename: string, strokes: boolean, images: boolean, texts: boolean, separateLayers: boolean){
+    const converter: Converter = Converter.build()
+    converter.convert(strokes, images, texts, separateLayers);
+    converter.download(filename);
 }
 
 interface ConvertMessage{
