@@ -1,5 +1,6 @@
 import browser from "webextension-polyfill";
 
+
 const exportButton = document.getElementById("export");
 const fileNameInput = document.getElementById("fileName") as (HTMLInputElement | null);
 const exportImages = document.getElementById("exportImages") as (HTMLInputElement | null);
@@ -11,8 +12,8 @@ const textError = document.getElementById('textError');
 
 document.addEventListener('DOMContentLoaded', async () => {
     const tab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
-    if(!tab.url?.startsWith('https://onedrive.live.com/')){
-        if(container){
+    if (!tab.url?.startsWith('https://onedrive.live.com/')) {
+        if (container) {
             container.innerHTML = '';
             const error = document.createElement("span");
             error.classList.add('border-color');
@@ -23,8 +24,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 })
 
 exportButton?.addEventListener('click', async () => {
+    const granted = await browser.permissions.request({origins: ["https://onenote.officeapps.live.com/*"]});
+    if(!granted){
+        if(textError) {
+            textError.innerText = "Cannot convert the page without required permission";
+        }
+        return;
+    }
     const tab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
-    try{
+    try {
         await browser.tabs.sendMessage(tab?.id ?? 0, {
             text: JSON.stringify({
                 message: 'convert',
@@ -35,10 +43,9 @@ exportButton?.addEventListener('click', async () => {
                 separateLayers: exportSeparateLayers?.checked ?? true
             })
         });
-    }catch{
-        if(textError){
-            textError.innerText = "Extension hasn't load properly. Couldn't export document.";
+    } catch {
+        if (textError) {
+            textError.innerText = "Extension hasn't load properly. Couldn't export document. Try to refresh the page.";
         }
     }
-
 });
