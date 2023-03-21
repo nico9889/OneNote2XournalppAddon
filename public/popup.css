@@ -99,15 +99,19 @@ label.checkbox-text{
     user-select: none;
 }
 
-.text-default{
-    color: var(--dark);
-}
-
 .footer{
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
     font-size: 1rem;
     font-weight: bold;
+}
+
+.text-default{
+    color: var(--dark);
+}
+
+.text-danger{
+    color: #dc3545;
 }
 
 @media (prefers-color-scheme: dark) {

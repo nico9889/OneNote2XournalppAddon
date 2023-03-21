@@ -7,6 +7,7 @@ const exportTexts = document.getElementById("exportTexts") as (HTMLInputElement 
 const exportStrokes = document.getElementById("exportStrokes") as (HTMLInputElement | null);
 const exportSeparateLayers = document.getElementById("exportSeparateLayers") as (HTMLInputElement | null);
 const container = document.getElementById('container');
+const textError = document.getElementById('textError');
 
 document.addEventListener('DOMContentLoaded', async () => {
     const tab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
@@ -23,14 +24,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 exportButton?.addEventListener('click', async () => {
     const tab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
-    await browser.tabs.sendMessage(tab?.id ?? 0, {
-        text: JSON.stringify({
-            message: 'convert',
-            filename: fileNameInput?.value,
-            images: exportImages?.checked ?? true,
-            texts: exportTexts?.checked ?? true,
-            strokes: exportStrokes?.checked ?? true,
-            separateLayers: exportSeparateLayers?.checked ?? true
-        })
-    });
+    try{
+        await browser.tabs.sendMessage(tab?.id ?? 0, {
+            text: JSON.stringify({
+                message: 'convert',
+                filename: fileNameInput?.value,
+                images: exportImages?.checked ?? true,
+                texts: exportTexts?.checked ?? true,
+                strokes: exportStrokes?.checked ?? true,
+                separateLayers: exportSeparateLayers?.checked ?? true
+            })
+        });
+    }catch{
+        if(textError){
+            textError.innerText = "Extension hasn't load properly. Couldn't export document.";
+        }
+    }
+
 });
