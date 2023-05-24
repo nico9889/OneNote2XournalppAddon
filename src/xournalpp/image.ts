@@ -7,13 +7,13 @@ export class Image{
 
     constructor(data: string, x: number, y: number, width: number, height: number) {
         this.data = data;
-        this.left = x
-        this.top = y
-        this.right = x + width
-        this.bottom = y + height
+        this.left = x;
+        this.top = y;
+        this.right = (x + width);
+        this.bottom = (y + height);
     }
 
     toXml(){
-        return (this.data) ? `<image left="${this.left}" right="${this.right}" top="${this.top}" bottom="${this.bottom}">${this.data}</image>`: "";
+        return (this.data) ? `<image left="${this.left.toFixed(4)}" right="${this.right.toFixed(4)}" top="${this.top.toFixed(4)}" bottom="${this.bottom.toFixed(4)}">${this.data}</image>`: "";
     }
 }

@@ -31,6 +31,7 @@ exportButton?.addEventListener('click', async () => {
         }
         return;
     }
+
     const tab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
     try {
         await browser.tabs.sendMessage(tab?.id ?? 0, {

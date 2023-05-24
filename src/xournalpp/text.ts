@@ -47,6 +47,6 @@ export class Text {
     toXml(){
         this.wrap();
         this.escape();
-        return `<text font="${this.font}" size="${this.size}" x="${this.x}" y="${this.y}" color="${this.color.toString()}" ts="${this.ts}" fn="${this.fn}">${this.data}</text> `
+        return `<text font="${this.font}" size="${this.size.toFixed(0)}" x="${this.x.toFixed(4)}" y="${this.y.toFixed(4)}" color="${this.color.toString()}" ts="${this.ts}" fn="${this.fn}">${this.data}</text> `
     }
 }
