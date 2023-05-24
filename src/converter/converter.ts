@@ -165,6 +165,9 @@ export class Converter {
     }
 
     convertImages(offset_x: number, offset_y: number, additional?: { max_width: number, max_height: number }): Image[] {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
         const converted_images: Image[] = [];
         const image_containers = document.getElementsByClassName("WACImageContainer") as HTMLCollectionOf<HTMLDivElement>;
         console.debug("O2X: Converting images");
@@ -178,11 +181,21 @@ export class Converter {
             const y: number = Number(container.style.top.replace("px", "")) || 0;
             const image: HTMLImageElement = (container.getElementsByClassName("WACImage") as HTMLCollectionOf<HTMLImageElement>)[0];
             const image_boundaries = image.getBoundingClientRect();
-            const data = image.src.replace(new RegExp("data:image/.*;base64,"), "");
-            const width = image.width;
-            const height = image.height;
 
-            const converted_image = new Image(data, x || (image_boundaries.x - offset_x), y || (image_boundaries.y - offset_y), width, height);
+            /* Converting non-PNG image to PNG using Canvas */
+            let src = image.src;
+            const isPng = new RegExp("data:image/png;base64,.*");
+            if(ctx && !isPng.test(src)){
+                canvas.width = image.width;
+                canvas.height = image.height;
+                ctx.drawImage(image, 0,0, image.width, image.height);
+                src = canvas.toDataURL("image/png", 0.8);
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+            }
+
+            const data = src.replace(new RegExp("data:image/.*;base64,"), "");
+
+            const converted_image = new Image(data, x || (image_boundaries.x - offset_x), y || (image_boundaries.y - offset_y), image.width, image.height);
             converted_images.push(converted_image);
 
             // Inelegant solution to export images max_width and max_height by side effect without
