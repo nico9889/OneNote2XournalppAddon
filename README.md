@@ -1,5 +1,8 @@
 # OneNote2XournalppAddon
 
+[![Get on Addons Mozilla Online](https://extensionworkshop.com/assets/img/documentation/publish/get-the-addon-178x60px.dad84b42.png)](https://addons.mozilla.org/it/firefox/addon/onenote-to-xournal/)
+[![Get on Chrome Web Store](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/UV4C4ybeBTsZt43U4xis.png)](https://chrome.google.com/webstore/detail/onenote-to-xournal%20%20/lbghdcdjdfngepdkmmemagflaekkmjmf)
+
 This is an addon for browser that permits to convert OneNote notes into Xournal++ XOPP format.
 
 # Motivation
