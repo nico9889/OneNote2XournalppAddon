@@ -7,6 +7,7 @@
 body{
     font-family: sans-serif;
     text-align: center;
+    overflow: hidden;
 }
 
 .m-3{
@@ -17,9 +18,13 @@ body{
     margin: auto;
 }
 
-.my-3{
-    margin-top: 1rem !important;
-    margin-bottom: 1rem !important;
+.mb-auto{
+    margin-bottom: auto !important;
+}
+
+.my-2{
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
 }
 
 .px-1{
@@ -29,8 +34,21 @@ body{
 
 .container{
     display: flex;
-    flex-grow: 1;
+    flex: 1 0 auto;
     flex-direction: column;
+}
+
+.log{
+    padding: 0.25rem;
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    width: 50vw;
+    height: 50vh;
+    max-width: 50vh;
+    max-height: 50vh;
+    overflow-y: auto;
+    text-align: start;
 }
 
 hr{
@@ -51,6 +69,8 @@ h4{
     box-shadow: 0 0 0.5rem 0 rgba(0,0,0,0.4);
     font-size: 1rem;
     font-weight: bold;
+    align-content: center;
+    align-items: center;
 }
 
 .btn:hover{
@@ -70,8 +90,7 @@ h4{
 }
 
 .additional-options{
-    margin-left: auto;
-    margin-right: auto;
+    text-align: start;
 }
 
 .text-muted{
@@ -80,6 +99,7 @@ h4{
 
 .row{
     display: flex;
+    flex: 1 0 auto;
     flex-direction: row;
 }
 
@@ -112,6 +132,31 @@ label.checkbox-text{
 
 .text-danger{
     color: #dc3545;
+}
+
+.bg-auto{
+    background-color: var(--dark);
+    color: var(--light);
+}
+
+.bg-danger{
+    background-color: #dc3545;
+}
+
+.bg-success{
+    background-color: #198754;
+}
+
+.bg-warning{
+    background-color: #fd7e14;
+}
+
+.bg-debug{
+    background-color: #0d6efd;
+}
+
+.d-none{
+    display: none;
 }
 
 @media (prefers-color-scheme: dark) {

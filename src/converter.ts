@@ -1,14 +1,20 @@
 import browser from "webextension-polyfill";
 import {Converter} from "./converter/converter";
+import {Log} from "./log/log";
 
-function convert(filename: string, strokes: boolean, images: boolean, texts: boolean, separateLayers: boolean){
-    const converter: Converter = Converter.build()
-    converter.convert(strokes, images, texts, separateLayers);
-    converter.download(filename);
+const log = new Log();
+
+function convert(filename: string, strokes: boolean, images: boolean, texts: boolean, separateLayers: boolean) {
+    const converter: Converter = Converter.build(log);
+    converter.convert(strokes, images, texts, separateLayers, filename);
+    converter.download();
 }
 
-interface ConvertMessage{
-    message: string,
+interface Message {
+    message: string;
+}
+
+interface ConvertMessage extends Message {
     filename: string,
     images: boolean,
     texts: boolean,
@@ -16,9 +22,27 @@ interface ConvertMessage{
     separateLayers: boolean
 }
 
+interface LogEnableMessage extends Message {
+    enable: boolean;
+}
+
+interface LogDebugMessage extends Message {
+    enable: boolean;
+}
+
 browser.runtime.onMessage.addListener((msg, sender) => {
-    const data = JSON.parse(msg.text) as (ConvertMessage);
-    if(data.message == 'convert'){
-        convert(data.filename, data.strokes, data.images, data.texts,  data.separateLayers)
+    const message = JSON.parse(msg.text) as (Message);
+    if (message.message === 'convert') {
+        const convert_message = message as ConvertMessage;
+        convert(convert_message.filename, convert_message.strokes, convert_message.images, convert_message.texts, convert_message.separateLayers)
+    } else if (message.message === 'full_log') {
+        log.writeAll();
+    } else if (message.message === 'log_enable') {
+        const log_enable = message as LogEnableMessage;
+        log.enabled = log_enable.enable
+    } else if (message.message === 'log_debug') {
+
+        const log_debug = message as LogDebugMessage;
+        log.debugEnabled = log_debug.enable;
     }
 });

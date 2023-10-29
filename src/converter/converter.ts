@@ -5,8 +5,11 @@ import {Layer, Page} from "../xournalpp/page";
 import {Document} from "../xournalpp/document";
 import {Color, RGBAColor} from "../xournalpp/utils";
 import {gzip} from "pako";
+import {Log} from "../log/log";
 
 export class Converter {
+    private log: Log;
+
     // Stroke need to be scaled to this size
     scaleX: number = 0.04;
     scaleY: number = 0.04;
@@ -19,22 +22,25 @@ export class Converter {
     static instance: Converter;
 
     // Exported file
+    title: string | undefined;
     pom: HTMLAnchorElement | undefined;
 
-    private constructor() {
+    private constructor(log: Log) {
+        this.log = log;
     }
 
-    static build(): Converter {
+    static build(log: Log): Converter {
         if (!this.instance) {
-            this.instance = new Converter();
+            this.instance = new Converter(log);
         }
         return this.instance;
     }
 
     convertStrokes(additional?: { max_width: number, max_height: number }): Stroke[] {
+        this.log.info("Converting strokes");
         const converted_strokes: Stroke[] = [];
         const strokes = document.getElementsByClassName("InkStrokeOuterElement") as HTMLCollectionOf<SVGElement>;
-        console.debug("O2X: Converting strokes");
+        this.log.info(`Found ${strokes.length} stroke(s)`);
         for (const stroke of strokes) {
             const strokeBoundaries = stroke.getBoundingClientRect();
 
@@ -119,11 +125,11 @@ export class Converter {
                     } else {
                         // Skips unmanaged directives, warning the user that this value has been unused
                         // so if it was useful it can be reported
-                        console.debug(`O2X: Skipped ${directives[i]}`)
+                        this.log.debug(`Skipping unrecognised stroke directive: ${directives[i]}`);
                     }
                 }
             } else {
-                console.warn(`O2X: Invalid stroke: 'd' not found in ${path}`);
+                this.log.warn(`Invalid stroke detected: missing 'd' in ${path}`);
             }
         }
         return converted_strokes;
@@ -134,9 +140,10 @@ export class Converter {
     }
 
     convertTexts(offset_x: number, offset_y: number, additional?: { max_width: number, max_height: number }): Text[] {
+        this.log.info("Converting texts");
         const texts = document.getElementsByClassName("TextRun") as HTMLCollectionOf<HTMLSpanElement>;
         const converted_texts: Text[] = [];
-        console.debug("O2X: Converting texts");
+        this.log.info(`Found ${texts.length} text(s)`);
         for (const text of texts) {
             if (text.children[0].innerHTML) {
                 const textBoundaries = text.getBoundingClientRect();
@@ -165,12 +172,13 @@ export class Converter {
     }
 
     convertImages(offset_x: number, offset_y: number, additional?: { max_width: number, max_height: number }): Image[] {
+        this.log.info("Converting images");
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
 
         const converted_images: Image[] = [];
         const image_containers = document.getElementsByClassName("WACImageContainer") as HTMLCollectionOf<HTMLDivElement>;
-        console.debug("O2X: Converting images");
+        this.log.info(`Found ${image_containers.length} image(s)`);
         for (const container of image_containers) {
             // OneNote uses (at least?) two type of positioning method for the images:
             // Absolute: coordinates are inside the WACImageContainer style;
@@ -185,12 +193,12 @@ export class Converter {
             /* Converting non-PNG image to PNG using Canvas */
             let src = image.src;
             const isPng = new RegExp("data:image/png;base64,.*");
-            if(ctx && !isPng.test(src)){
+            if (ctx && !isPng.test(src)) {
                 canvas.width = image.width;
                 canvas.height = image.height;
-                ctx.drawImage(image, 0,0, image.width, image.height);
+                ctx.drawImage(image, 0, 0, image.width, image.height);
                 src = canvas.toDataURL("image/png", 0.8);
-                ctx.clearRect(0,0,canvas.width,canvas.height);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
 
             const data = src.replace(new RegExp("data:image/.*;base64,"), "");
@@ -209,78 +217,121 @@ export class Converter {
         return converted_images
     }
 
-    convert(strokes: boolean, images: boolean, texts: boolean, separateLayers: boolean) {
+    private getTitle(): string {
+        const pages = document.getElementById("OreoPageColumn") as HTMLDivElement | null;
+        if (!pages) {
+            return document.title;
+        }
+        const page = pages?.querySelector("div.active[title]") as HTMLDivElement | null;
+        if (!page) {
+            return document.title;
+        }
+        return page.innerText;
+
+    }
+
+    convert(strokes: boolean, images: boolean, texts: boolean, separateLayers: boolean, title?: string) {
+        this.log.info("Conversion started");
         // Page dimensions
         const dimension = {
             max_width: 0,
             max_height: 0
         }
 
-        console.debug("O2X: Converting...");
+        if (!title) {
+            try {
+                title = this.getTitle();
+            } catch (e) {
+                console.error(`O2X: ${e}`);
+            }
+            if (!title) title = document.title;
+        }
+        this.title = title;
+
         const panel = document.getElementById("WACViewPanel");
         if (!panel) {
-            console.error("Conversion failed: cannot find WACViewPanel");
+            this.log.error("Conversion failed: cannot find WACViewPanel");
             return;
         }
         const panel_boundaries = panel.getBoundingClientRect();
 
         const converted_texts: Text[] = (texts) ? this.convertTexts(panel_boundaries.x, panel_boundaries.y, dimension) : [];
-        const converted_images: Image[] = (images)? this.convertImages(panel_boundaries.x, panel_boundaries.y, dimension) : [];
+        const converted_images: Image[] = (images) ? this.convertImages(panel_boundaries.x, panel_boundaries.y, dimension) : [];
         const converted_strokes: Stroke[] = (strokes) ? this.convertStrokes(dimension) : [];
 
-        console.debug("O2X: Assembling document");
-        const exportDoc = new Document(document.title);
-        const page = new Page();
+        this.log.info("Creating new XOPP file");
+        const exportDoc = new Document(title);
 
+        this.log.info("Creating new page");
+        const page = new Page();
         page.height = dimension.max_height + 5;
         page.width = dimension.max_width + 5;
 
-        if(separateLayers){
+        if (separateLayers) {
             // To simplify the edit of the exported document different layers are used for different elements
+            this.log.info("Creating images layer");
             const images_layer = new Layer();
+            this.log.info("Adding images");
             images_layer.images = converted_images;
+
+            this.log.info("Creating texts layer");
             const texts_layer = new Layer();
+            this.log.info("Adding texts");
             texts_layer.texts = converted_texts;
+
+            this.log.info("Creating strokes layer");
             const strokes_layer = new Layer();
+            this.log.info("Adding strokes")
             strokes_layer.strokes = converted_strokes;
+
+            this.log.info("Adding layers to the page");
             page.layers.push(images_layer);
             page.layers.push(texts_layer);
             page.layers.push(strokes_layer);
-        }else{
+        } else {
+            this.log.info("Creating new common layer");
             const layer = new Layer();
+            this.log.info("Adding elements to the layer");
             layer.images = converted_images;
             layer.texts = converted_texts;
             layer.strokes = converted_strokes;
+
+            this.log.info("Adding layer to the page");
             page.layers.push(layer);
         }
 
+        this.log.info("Adding page to the document");
         exportDoc.pages.push(page);
 
-        console.debug("O2X: Preparing document to exportation");
+        this.log.info("Generating output file (GZipping)");
         // Xournal++ file format is a GZIP archive with an XML file inside. We need to GZIP the XML before
         // exporting it
         const archive = gzip(exportDoc.toXml());
 
+        this.log.info("Exporting file");
         // The GZIP file is associated to a phantom Anchor element to be exported
         const blob = new Blob([archive], {type: "application;gzip"});
         const url = URL.createObjectURL(blob);
         this.pom = document.createElement("a");
         this.pom.setAttribute('href', url);
+        this.log.success("File exported successfully");
     }
 
-    download(filename: string) {
-        let title = filename;
-        if (!title) {
+    download() {
+        let title = "OneNote";
+        if (!this.title) {
             const titles = document.getElementsByClassName("Title GrowUnderline");
             if (titles) {
                 const spans = titles[0].getElementsByTagName("span");
                 const titleSpan = spans[0];
                 title = titleSpan.textContent ?? "OneNote";
             }
+        }else{
+            title = this.title;
         }
 
         if (!this.pom) {
-            console.error("No file has been converted. Cannot export");
+            this.log.error("No file converted. Cannot download.");
             return;
         }
 

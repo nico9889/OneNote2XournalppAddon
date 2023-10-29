@@ -26,14 +26,16 @@ module.exports = {
                 test: /\.tsx?$/,
                 loader: "ts-loader",
                 exclude: /node_modules/,
-            },{
+            }, {
                 test: /.s?css$/,
                 use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
             }
         ],
     },
     optimization: {
-        minimizer: [new CssMinimizerPlugin(), new HtmlMinimizerPlugin(), new TerserPlugin()]
+        minimizer: [new CssMinimizerPlugin({
+            exclude: [new RegExp("bg-*")]
+        }), new HtmlMinimizerPlugin(), new TerserPlugin()]
     },
     plugins: [
         new CopyPlugin({

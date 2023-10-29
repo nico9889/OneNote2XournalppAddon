@@ -33,6 +33,9 @@ export class Layer{
     images: Image[] = [];
     strokes: Stroke[] = [];
 
+    constructor() {
+    }
+
     toXml(): string {
         let out = "<layer>";
         for (const stroke of this.strokes) {

@@ -5,7 +5,9 @@
   "version": "1.1.6",
   "author": "nico9889",
   "homepage_url": "https://github.com/nico9889/OneNote2XournalppAddon",
-  "permissions": [],
+  "permissions": [
+    "storage"
+  ],
   "host_permissions": [
     "https://onedrive.live.com/*",
     "https://onenote.officeapps.live.com/*"

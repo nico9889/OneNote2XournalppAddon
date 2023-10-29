@@ -12,49 +12,71 @@
 </h4>
 <hr/>
 <div class="container" id="container">
-    <div class="file-name border-color">
-        <div class="row">
-            <div class="col px-1">
-                <label for="fileName">File name:</label>
-                <input type="text" id="fileName">
-                <div>
-                    <span class="text-muted">If empty it takes the<br/> name of the OneNote document</span>
+    <div class="row">
+        <div class="col">
+            <div class="file-name">
+                <div class="row">
+                    <div class="col">
+                        <label for="fileName">File name:</label>
+                        <input type="text" id="fileName">
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div>
+                            <span class="text-muted">If empty it takes the<br/> name of the OneNote document</span>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="col px-1">
+                            <button type="button" class="btn border-color m-3" id="export">Export</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col px-1">
-                <button type="button" class="btn border-color m-3" id="export">Export</button>
+            <div class="additional-options my-2 ">
+                <div class="row">
+                    <div class="col">
+                        <h4>Additional options:</h4>
+                        <div class="form-checkbox">
+                            <input type="checkbox" checked id="exportStrokes">
+                            <label class="checkbox-text" for="exportStrokes">Export strokes</label>
+                        </div>
+                        <div class="form-checkbox">
+                            <input type="checkbox" checked id="exportImages">
+                            <label class="checkbox-text" for="exportImages">Export images</label>
+                        </div>
+                        <div class="form-checkbox">
+                            <input type="checkbox" checked id="exportTexts">
+                            <label class="checkbox-text" for="exportTexts">Export texts</label>
+                        </div>
+                        <div class="form-checkbox">
+                            <input type="checkbox" checked id="exportSeparateLayers">
+                            <label class="checkbox-text" for="exportSeparateLayers">Export in separate layers</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h4>Log options: </h4>
+                        <button id="openLogButton" class="btn border-color my-2">Open/Close Log</button>
+                        <button id="enableDebugButton" class="btn border-color my-2">Enable/Disable debug</button>
+                    </div>
+                    <div class="col">
+
+                    </div>
+                </div>
+
             </div>
         </div>
-        <div class="row">
-            <span class="text-danger" id="textError"></span>
+        <div class="col d-none" id="logContainer">
+            <h4>Log: </h4>
+            <div class="log border-color mb-auto" id="log">
+
+            </div>
         </div>
     </div>
-    <div class="border-color">
-        <div class="additional-options m-auto my-3 ">
-            <h4>Additional options:</h4>
-            <div class="form-checkbox">
-                <input type="checkbox" checked id="exportStrokes">
-                <label class="checkbox-text" for="exportStrokes">Export strokes</label>
-            </div>
-            <div class="form-checkbox">
-                <input type="checkbox" checked id="exportImages">
-                <label class="checkbox-text" for="exportImages">Export images</label>
-            </div>
-            <div class="form-checkbox">
-                <input type="checkbox" checked id="exportTexts">
-                <label class="checkbox-text" for="exportTexts">Export texts</label>
-            </div>
-            <div class="form-checkbox">
-                <input type="checkbox" checked id="exportSeparateLayers">
-                <label class="checkbox-text" for="exportSeparateLayers">Export in separate layers</label>
-            </div>
-        </div>
-    </div>
-    <script src="onenote2xournalpp.js"></script>
 </div>
-<footer class="border-color">
-    <div class="footer row">
-        <div class="col">
+<footer>
     <div class="footer">
         <div class="row">
             <div class="col">
@@ -106,5 +128,6 @@
         </div>
     </div>
 </footer>
+<script src="onenote2xournalpp.js"></script>
 </body>
 </html>
