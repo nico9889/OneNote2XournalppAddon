@@ -32,6 +32,7 @@ export class Log {
     }
 
     write(line: LogLine) {
+        /* TODO
         this.#lines.push(line);
         if(this.#lines.length > 200){
             this.#lines = this.#lines.slice(1);
@@ -42,10 +43,11 @@ export class Log {
                 line: line
             }).then();
         }
+         */
     }
 
-    writeAll(){
-        if(this.enabled){
+    writeAll() {
+        if (this.enabled) {
             browser.runtime.sendMessage("{2986a98d-8431-4ed3-af49-df7b89bc555e}", {
                 message: "full_log",
                 lines: this.#lines.filter((line) => {

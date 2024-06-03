@@ -9,10 +9,12 @@ const exportTexts = document.getElementById("exportTexts") as (HTMLInputElement 
 const exportStrokes = document.getElementById("exportStrokes") as (HTMLInputElement | null);
 const exportSeparateLayers = document.getElementById("exportSeparateLayers") as (HTMLInputElement | null);
 const container = document.getElementById('container');
+/* TODO
 const log = document.getElementById('log');
 const logContainer = document.getElementById('logContainer');
 const openLogButton = document.getElementById('openLogButton');
 const enableDebugButton = document.getElementById('enableDebugButton');
+*/
 
 document.addEventListener('DOMContentLoaded', async () => {
     const tab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
@@ -48,6 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 });
 
+/* TODO
 async function openLog() {
     logContainer?.classList.remove('d-none');
     const tab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
@@ -120,7 +123,7 @@ enableDebugButton?.addEventListener('click', async () => {
         enableDebugButton.innerText = (!state) ? 'Disable debug' : 'Enable debug';
     }
 })
-
+ */
 
 exportButton?.addEventListener('click', async () => {
     const granted = await browser.permissions.request({origins: ["https://onenote.officeapps.live.com/*"]});
@@ -159,9 +162,11 @@ function writeLine(line: LogLine) {
     const row = document.createElement("span");
     row.classList.add(`bg-${COLORS[line.status]}`);
     row.innerText = `${line.status.toUpperCase()} - ${line.date.toLocaleString()} - ${line.text}`;
-    log?.prepend(row);
+    // TODO
+    //log?.prepend(row);
 }
 
+/* TODO
 browser.runtime.onMessage.addListener((message) => {
     if (message.message === 'log_line') {
         const line: LogLine = message.line;
@@ -176,3 +181,4 @@ browser.runtime.onMessage.addListener((message) => {
         }
     }
 });
+ */

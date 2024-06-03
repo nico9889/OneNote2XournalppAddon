@@ -36,6 +36,8 @@ browser.runtime.onMessage.addListener((msg, sender) => {
         const convert_message = message as ConvertMessage;
         convert(convert_message.filename, convert_message.strokes, convert_message.images, convert_message.texts, convert_message.separateLayers)
     } else if (message.message === 'full_log') {
+    /* TODO
+    else if (message.message === 'full_log') {
         log.writeAll();
     } else if (message.message === 'log_enable') {
         const log_enable = message as LogEnableMessage;
@@ -45,4 +47,5 @@ browser.runtime.onMessage.addListener((msg, sender) => {
         const log_debug = message as LogDebugMessage;
         log.debugEnabled = log_debug.enable;
     }
+     */
 });
