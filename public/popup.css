@@ -22,9 +22,14 @@ body{
     margin-bottom: auto !important;
 }
 
-.my-2{
-    margin-top: 0.5rem !important;
-    margin-bottom: 0.5rem !important;
+.my-0{
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.my-1{
+    margin-top: 0.25rem !important;
+    margin-bottom: 0.25rem !important;
 }
 
 .px-1{
@@ -53,18 +58,22 @@ body{
 
 hr{
     width: 100%;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
 }
 
-h4{
+.title{
     margin: 0;
+    align-content: center;
+    align-items: center;
 }
 
 .btn{
     border: transparent;
     background: transparent;
     margin: 0.25rem auto;
+    flex: 1 0 auto;
     width: max-content;
-    flex: 0 0 auto;
     padding: 0.5rem;
     box-shadow: 0 0 0.5rem 0 rgba(0,0,0,0.4);
     font-size: 1rem;
@@ -177,3 +186,4 @@ label.checkbox-text{
         color: var(--light);
     }
 }
+

@@ -1,7 +1,7 @@
 import {Text} from "../xournalpp/text";
 import {Image} from "../xournalpp/image";
 import {Stroke, Tool} from "../xournalpp/stroke";
-import {Layer, Page} from "../xournalpp/page";
+import {Background, BackgroundStyle, BackgroundType, Layer, Page} from "../xournalpp/page";
 import {Document} from "../xournalpp/document";
 import {Color, RGBAColor} from "../xournalpp/utils";
 import {gzip} from "pako";
@@ -36,11 +36,13 @@ export class Converter {
         return this.instance;
     }
 
-    convertStrokes(additional?: { max_width: number, max_height: number }): Stroke[] {
+    convertStrokes(dark_mode: boolean, additional?: { max_width: number, max_height: number }): Stroke[] {
         this.log.info("Converting strokes");
         const converted_strokes: Stroke[] = [];
         const strokes = document.getElementsByClassName("InkStrokeOuterElement") as HTMLCollectionOf<SVGElement>;
         this.log.info(`Found ${strokes.length} stroke(s)`);
+        const base_color = (dark_mode) ? Color.White : Color.Black;
+
         for (const stroke of strokes) {
             const strokeBoundaries = stroke.getBoundingClientRect();
 
@@ -78,7 +80,8 @@ export class Converter {
 
                 // OneNote stroke colors, defaults to black if not found
                 const colors = (pathStroke) ? this.color_regexp.exec(pathStroke) : ["0,0,0", "0", "0", "0"];
-                const color = (colors) ? new RGBAColor(Number(colors[1]), Number(colors[2]), Number(colors[3]), Math.round(opacity * 255)) : Color.Black;
+
+                const color = (colors) ? new RGBAColor(Number(colors[1]), Number(colors[2]), Number(colors[3]), Math.round(opacity * 255)) : base_color;
 
                 // OneNote stroke width, rounded to 2 decimal positions, defaults to 1 if not found
                 const width = Math.round(Number(path.getAttribute("stroke-width")) * this.strokeScale * 100) / 100 ?? 1;
@@ -139,7 +142,10 @@ export class Converter {
         return text.replace(/[^a-zA-Z0-9 ]+/, '') || "OneNote";
     }
 
-    convertTexts(offset_x: number, offset_y: number, additional?: { max_width: number, max_height: number }): Text[] {
+    convertTexts(offset_x: number, offset_y: number, dark_mode: boolean, additional?: {
+        max_width: number,
+        max_height: number
+    }): Text[] {
         this.log.info("Converting texts");
         const texts = document.getElementsByClassName("TextRun") as HTMLCollectionOf<HTMLSpanElement>;
         const converted_texts: Text[] = [];
@@ -152,10 +158,16 @@ export class Converter {
 
                 converted_text.data = text.children[0].innerHTML;
                 converted_text.size = Number(text.style.fontSize.replace("pt", "")) ?? 12;
-                // converted_text.color; TODO: not handled
+                if (dark_mode) {
+                    // converted_text.color; TODO: not handled
+                } else {
+                    // converted_text.color; TODO: not handled
+                }
+
                 converted_text.x = textBoundaries.x - offset_x;
                 converted_text.y = textBoundaries.y - offset_y;
                 converted_text.width = textBoundaries.width;
+
 
                 converted_texts.push(converted_text);
 
@@ -230,7 +242,7 @@ export class Converter {
 
     }
 
-    convert(strokes: boolean, images: boolean, texts: boolean, separateLayers: boolean, title?: string) {
+    convert(strokes: boolean, images: boolean, texts: boolean, separateLayers: boolean, dark_page: boolean, strokes_dark_mode: boolean, texts_dark_mode: boolean, title?: string) {
         this.log.info("Conversion started");
         // Page dimensions
         const dimension = {
@@ -255,15 +267,16 @@ export class Converter {
         }
         const panel_boundaries = panel.getBoundingClientRect();
 
-        const converted_texts: Text[] = (texts) ? this.convertTexts(panel_boundaries.x, panel_boundaries.y, dimension) : [];
+        const converted_texts: Text[] = (texts) ? this.convertTexts(panel_boundaries.x, panel_boundaries.y, texts_dark_mode, dimension) : [];
         const converted_images: Image[] = (images) ? this.convertImages(panel_boundaries.x, panel_boundaries.y, dimension) : [];
-        const converted_strokes: Stroke[] = (strokes) ? this.convertStrokes(dimension) : [];
+        const converted_strokes: Stroke[] = (strokes) ? this.convertStrokes(strokes_dark_mode, dimension) : [];
 
         this.log.info("Creating new XOPP file");
         const exportDoc = new Document(title);
 
         this.log.info("Creating new page");
-        const page = new Page();
+        const page_color = (dark_page) ? Color.Black : Color.White;
+        const page = new Page(new Background(BackgroundType.Solid, page_color));
         page.height = dimension.max_height + 5;
         page.width = dimension.max_width + 5;
 
@@ -326,7 +339,7 @@ export class Converter {
                 const titleSpan = spans[0];
                 title = titleSpan.textContent ?? "OneNote";
             }
-        }else{
+        } else {
             title = this.title;
         }
 
