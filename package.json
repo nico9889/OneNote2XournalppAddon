@@ -25,10 +25,10 @@
     "mini-css-extract-plugin": "^2.9.0",
     "terser-webpack-plugin": "^5.3.10",
     "ts-loader": "^9.5.1",
-    "typescript": "^5.4.5",
-    "web-ext": "^8.0.0",
+    "typescript": "^5.5.2",
+    "web-ext": "^8.2.0",
     "webextension-polyfill": "^0.10.0",
-    "webpack": "^5.91.0",
+    "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4"
   }
 }
