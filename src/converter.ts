@@ -24,6 +24,7 @@ interface LogDebugMessage extends Message {
  */
 
 browser.runtime.onMessage.addListener((msg) => {
+
     const message = JSON.parse(msg.text) as (Message);
     if (message.message === 'convert') {
         const convert_message = message as ConvertMessage;

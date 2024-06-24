@@ -45,7 +45,8 @@ let settings: Settings = {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const tab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
-    if (!tab.url?.startsWith('https://onedrive.live.com/')) {
+    if (!tab.url?.startsWith('https://onedrive.live.com/')
+        && !tab.url?.match("https:\\/\\/[a-zA-Z0-9-]+\\.sharepoint\\.com.*$")) {
         if (container) {
             container.innerHTML = '';
             const error = document.createElement("span");
@@ -185,7 +186,9 @@ enableDebugButton?.addEventListener('click', async () => {
  */
 
 exportButton?.addEventListener('click', async () => {
-    const granted = await browser.permissions.request({origins: ["https://onenote.officeapps.live.com/*"]});
+    const granted = await browser.permissions.request({
+        origins: ["https://onenote.officeapps.live.com/*", "https://*.officeapps.live.com/*"]
+    });
     if (!granted) {
         writeLine({
             status: Status.ERROR,
@@ -212,7 +215,7 @@ exportButton?.addEventListener('click', async () => {
         await browser.tabs.sendMessage(tab?.id ?? 0, {
             text: JSON.stringify(message)
         });
-    } catch {
+    } catch(e) {
         writeLine({
             status: Status.ERROR,
             date: new Date(),
@@ -222,7 +225,6 @@ exportButton?.addEventListener('click', async () => {
 });
 
 function writeLine(line: LogLine) {
-    console.debug(line.text);
     const row = document.createElement("span");
     row.classList.add(`bg-${COLORS[line.status]}`);
     row.innerText = `${line.status.toUpperCase()} - ${line.date.toLocaleString()} - ${line.text}`;

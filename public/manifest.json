@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OneNote to Xournal++",
   "description": "This addon converts OneNote notes to Xournal++ notes.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": "nico9889",
   "homepage_url": "https://github.com/nico9889/OneNote2XournalppAddon",
   "permissions": [
@@ -10,12 +10,14 @@
   ],
   "host_permissions": [
     "https://onedrive.live.com/*",
-    "https://onenote.officeapps.live.com/*"
+    "https://*.sharepoint.com/*"
+
   ],
   "content_scripts": [
     {
       "matches": [
-        "https://onenote.officeapps.live.com/*"
+        "https://onenote.officeapps.live.com/*",
+        "https://*.officeapps.live.com/*"
       ],
       "all_frames": true,
       "js": [
