@@ -11,13 +11,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "pako": "^2.1.0"
-  },
   "devDependencies": {
     "@types/chrome": "^0.0.248",
     "@types/firefox": "^0.0.33",
-    "@types/pako": "^2.0.3",
     "@types/web": "^0.0.119",
     "@types/webextension-polyfill": "^0.10.7",
     "esbuild": "^0.21.5",

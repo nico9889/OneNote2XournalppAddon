@@ -317,17 +317,26 @@ export class Converter {
         exportDoc.pages.push(page);
 
         this.log.info("Generating output file (GZipping)");
+
         // Xournal++ file format is a GZIP archive with an XML file inside. We need to GZIP the XML before
         // exporting it
-        const archive = gzip(exportDoc.toXml());
+        const data = new Blob([exportDoc.toXml()], { type: "application/xml" });
+        const compressedStream = data.stream().pipeThrough(
+            new CompressionStream("gzip")
+        );
 
+        const response = new Response(compressedStream);
         this.log.info("Exporting file");
-        // The GZIP file is associated to a phantom Anchor element to be exported
-        const blob = new Blob([archive], {type: "application;gzip"});
-        const url = URL.createObjectURL(blob);
-        this.pom = document.createElement("a");
-        this.pom.setAttribute('href', url);
-        this.log.success("File exported successfully");
+
+        response.blob().then((blob) => {
+            // The GZIP file is associated to a phantom Anchor element to be exported
+            this.pom = document.createElement("a");
+            this.pom.setAttribute('href', URL.createObjectURL(blob));
+            this.log.success("File exported successfully");
+            this.download();
+        })
+
+
     }
 
     download() {

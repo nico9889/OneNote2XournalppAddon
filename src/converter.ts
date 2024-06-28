@@ -9,7 +9,6 @@ const log = new Log();
 function convert(filename: string, strokes: boolean, images: boolean, texts: boolean, dark_page: boolean, strokes_dark_mode: boolean, texts_dark_mode: boolean, separateLayers: boolean) {
     const converter: Converter = Converter.build(log);
     converter.convert(strokes, images, texts, separateLayers, dark_page, strokes_dark_mode, texts_dark_mode, filename);
-    converter.download();
 }
 
 
