@@ -45,4 +45,5 @@ files.filter(file => !exclude_files.includes(file)).forEach(file => {
     fs.copyFileSync(`./public/${file}`, `./dist/${file}`);
 });
 
+fs.cpSync("./_locales", `./dist/_locales`, {recursive: true, force: true});
 

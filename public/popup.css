@@ -12,6 +12,10 @@ body{
     max-width: 25rem;
 }
 
+a[href]{
+    color: #ffffff;
+}
+
 .m-3{
     margin: 1rem;
 }
@@ -118,6 +122,8 @@ hr{
     display: flex;
     flex-direction: column;
     margin: auto;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
 }
 
 .form-checkbox{

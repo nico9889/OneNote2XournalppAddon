@@ -1,0 +1,44 @@
+{
+  "restrictedPages": {
+    "message": "This addon works only on OneNote or SharePoint pages"
+  },
+  "fileNameLabel": {
+    "message": "File name:"
+  },
+  "emptyNameInfo": {
+    "message": "If empty it takes the name of the OneNote document"
+  },
+  "exportButton": {
+    "message": "Export"
+  },
+  "optionsTitle": {
+    "message": "Options:"
+  },
+  "exportStrokesLabel": {
+    "message": "Export strokes"
+  },
+  "exportImagesLabel": {
+    "message": "Export images"
+  },
+  "exportTextsLabel": {
+    "message": "Export texts"
+  },
+  "exportSeparateLayersLabel": {
+    "message": "Export in separate layers"
+  },
+  "exportDarkModeLabel": {
+    "message": "Dark page"
+  },
+  "sourceCodeText": {
+    "message": "Source code"
+  },
+  "addonText": {
+    "message": "Addon"
+  },
+  "donateText": {
+    "message": "Donate"
+  },
+  "reportIssueText": {
+    "message": "Report an issue"
+  }
+}
