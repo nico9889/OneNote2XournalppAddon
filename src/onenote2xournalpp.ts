@@ -2,20 +2,12 @@ import browser from "webextension-polyfill";
 import {Status, LogLine, COLORS} from "./log/log";
 import {ConvertMessage} from "./messages/convert";
 
-
-// Texts zone (I hate this)
-const fileNameLabel: HTMLLabelElement = document.getElementById("fileNameLabel") as HTMLLabelElement;
-const emptyNameInfo: HTMLSpanElement = document.getElementById("emptyNameInfo") as HTMLSpanElement;
-const optionsTitle: HTMLHeadingElement = document.getElementById("optionsTitle") as HTMLHeadingElement;
-const exportStrokesLabel: HTMLLabelElement = document.getElementById("exportStrokesLabel") as HTMLLabelElement;
-const exportImagesLabel: HTMLLabelElement = document.getElementById("exportImagesLabel") as HTMLLabelElement;
-const exportTextsLabel: HTMLLabelElement = document.getElementById("exportTextsLabel") as HTMLLabelElement;
-const exportSeparateLayersLabel: HTMLLabelElement = document.getElementById("exportSeparateLayersLabel") as HTMLLabelElement;
-const exportDarkModeLabel: HTMLLabelElement = document.getElementById("exportDarkModeLabel") as HTMLLabelElement;
-const sourceCodeText: HTMLSpanElement = document.getElementById("sourceCodeText") as HTMLSpanElement;
-const addonText: HTMLSpanElement = document.getElementById("addonText") as HTMLSpanElement;
-const donateText: HTMLSpanElement = document.getElementById("donateText") as HTMLSpanElement;
-const reportIssueText: HTMLSpanElement = document.getElementById("reportIssueText") as HTMLSpanElement;
+document.querySelectorAll<HTMLElement>('[o2x-i18n]').forEach((el) => {
+    const message = browser.i18n.getMessage(el.getAttribute('o2x-i18n')!);
+    if (message){
+        el.innerText = message;
+    }
+});
 
 // Input zone
 const exportButton: HTMLButtonElement = document.getElementById("exportButton") as HTMLButtonElement;
@@ -26,22 +18,6 @@ const exportStrokes: HTMLInputElement = document.getElementById("exportStrokes")
 const exportSeparateLayers: HTMLInputElement = document.getElementById("exportSeparateLayers") as (HTMLInputElement);
 const exportDarkMode: HTMLInputElement = document.getElementById("exportDarkMode") as (HTMLInputElement);
 const container: HTMLInputElement = document.getElementById('container') as HTMLInputElement;
-
-
-// Localization section
-fileNameLabel.innerText = browser.i18n.getMessage("fileNameLabel");
-emptyNameInfo.innerText = browser.i18n.getMessage("emptyNameInfo");
-exportButton.innerText = browser.i18n.getMessage("exportButton");
-optionsTitle.innerText = browser.i18n.getMessage("optionsTitle");
-exportStrokesLabel.innerText = browser.i18n.getMessage("exportStrokesLabel");
-exportImagesLabel.innerText = browser.i18n.getMessage("exportImagesLabel");
-exportTextsLabel.innerText = browser.i18n.getMessage("exportTextsLabel");
-exportSeparateLayersLabel.innerText = browser.i18n.getMessage("exportSeparateLayersLabel");
-exportDarkModeLabel.innerText = browser.i18n.getMessage("exportDarkModeLabel");
-sourceCodeText.innerText = browser.i18n.getMessage("sourceCodeText");
-addonText.innerText = browser.i18n.getMessage("addonText");
-donateText.innerText = browser.i18n.getMessage("donateText");
-reportIssueText.innerText = browser.i18n.getMessage("reportIssueText");
 
 /* TODO
 const log = document.getElementById('log');
@@ -75,9 +51,6 @@ let settings: Settings = {
 
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log(browser.i18n.getUILanguage());
-    console.log(await browser.i18n.getAcceptLanguages());
-    console.log(browser.i18n.getMessage("restrictedPages"));
     const tab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
     if (!tab.url?.startsWith('https://onedrive.live.com/')
         && !tab.url?.match("https:\\/\\/[a-zA-Z0-9-]+\\.sharepoint\\.com.*$")) {
