@@ -151,7 +151,7 @@ export class Converter {
         const converted_texts: Text[] = [];
         this.log.info(`Found ${texts.length} text(s)`);
         for (const text of texts) {
-            if (text.children[0].innerHTML) {
+            if (text.children[0]?.innerHTML) {
                 const textBoundaries = text.getBoundingClientRect();
 
                 const converted_text = new Text();
