@@ -6,15 +6,22 @@ import {Document} from "../xournalpp/document";
 import {Color, RGBAColor} from "../xournalpp/utils";
 import {Log} from "../log/log";
 import {TexImage} from "../xournalpp/teximage";
-import { MathMLToLaTeX } from 'mathml-to-latex';
+import {MathMLToLaTeX} from 'mathml-to-latex';
+
+import { mathjax } from 'mathjax-full/mjs/mathjax.js'
+import { MathML} from 'mathjax-full/mjs/input/mathml.js'
+import { SVG } from 'mathjax-full/mjs/output/svg.js'
+import { liteAdaptor } from 'mathjax-full/mjs/adaptors/liteAdaptor.js'
+import { RegisterHTMLHandler } from 'mathjax-full/mjs/handlers/html.js'
 
 
 const image_base64_strip = new RegExp("data:image/.*;base64,");
-
+const adaptor = liteAdaptor()
+RegisterHTMLHandler(adaptor)
 
 export class Converter {
     private log: Log;
-
+    adaptor = liteAdaptor();
     // Stroke need to be scaled to this size
     scaleX: number = 0.04;
     scaleY: number = 0.04;
@@ -32,6 +39,7 @@ export class Converter {
 
     private constructor(log: Log) {
         this.log = log;
+        RegisterHTMLHandler(this.adaptor);
     }
 
     static build(log: Log): Converter {
@@ -234,18 +242,10 @@ export class Converter {
         return converted_images
     }
 
-
-    // Function to "convert" raw MathML to SVG
-    mathMLToSvg(math: MathMLElement){
-        const boundingRect = math.getBoundingClientRect();
-        return `<svg xmlns="https://www.w3.org/2000/svg" width="${boundingRect.width}" height="${boundingRect.height}">
-<foreignObject width="100%" height="100%">
-    ${math.outerHTML}
-</foreignObject>
-</svg>`
-    }
-
-    private async convertMathMLBlocks(offset_x: number, offset_y: number, math_dark_mode: boolean, additional?: { max_width: number; max_height: number }) {
+    private async convertMathMLBlocks(offset_x: number, offset_y: number, math_dark_mode: boolean, additional?: {
+        max_width: number;
+        max_height: number
+    }) {
         this.log.info("Converting MathML blocks");
         const converted_blocks: TexImage[] = [] // Empty output array
 
@@ -254,33 +254,43 @@ export class Converter {
         this.log.info(`Found ${math_containers.length} MathML block(s)`);
 
         // Preparing canvas for image conversion
-        const canvas = document.createElement("canvas");
+        const canvas = document.createElement("canvas") as HTMLCanvasElement;
         const ctx = canvas.getContext("2d")!;
-        for(const container of math_containers) {
-            const boundingRect = container.getBoundingClientRect();
-            const latex = MathMLToLaTeX.convert(container.innerHTML);
-            try{
-                // Moving MathML into SVG since it seems to be 100% compatible
-                const svg = this.mathMLToSvg(container.children[0] as MathMLElement);
+        for (const container of math_containers) {
+            const math_element = container.children[0] as MathMLElement;
+            const boundingRect = math_element.getBoundingClientRect();
+            const latex = MathMLToLaTeX.convert(math_element.outerHTML);
 
-
-                // Converting to SVG to Base64 to load it as an Image
-                const img = document.createElement("img");
-                img.src = `data:image/svg+xml;base64,${btoa(encodeURI(svg))}`;
-
-                // FIXME: I'm getting error here, while trying to load the SVG image
-                //  The generated SVG string in theory is valid since browsers seems to load it
-                //  correctly if saved into a file.
-                await new Promise((resolve, reject) => {
-                   img.onload = () => (resolve(img));
-                   img.onerror = reject;
+            try {
+                const mathDocument = mathjax.document('', {
+                    InputJax: new MathML(),
+                    OutputJax: new SVG({ fontCache: 'local' })
                 });
 
-                // Drawing the image into a Canvas
-                ctx.drawImage(img, 0, 0);
+                const node = mathDocument.convert(container.innerHTML);
+                const blob = new Blob([adaptor.innerHTML(node)], {type: "image/svg+xml;charset=utf-8"});
+
+                const url = URL.createObjectURL(blob);
+
+                // Converting to SVG to Base64 to load it as an Image
+                const img = new window.Image();
+                await new Promise((resolve, reject) => {
+                    img.onload = () => {
+                        resolve(img)
+                    };
+                    img.onerror = (e) => {
+                        reject(e)
+                    }
+                    img.src = url;
+                });
+
+
+                // Drawing the image into a Canvas, dimensions are multiplied by 4 to get a crispier text
+                ctx.drawImage(img, 0, 0, boundingRect.width * 4, boundingRect.height * 4);
 
                 // Exporting the Canvas as an encoded Base64 PNG string
-                const uri = canvas.toDataURL("image/png", 0.8);
+
+                const uri = canvas.toDataURL("image/png", 1);
 
                 // Creating a new TexImage with dimensions and data, this object handles
                 // the XML conversion
@@ -289,22 +299,20 @@ export class Converter {
                     uri.replace(image_base64_strip, ""),
                     boundingRect.x - offset_x,
                     boundingRect.y - offset_y,
-                    boundingRect.x +  canvas.width,
-                    boundingRect.y + canvas.height,
+                    boundingRect.width,
+                    boundingRect.height,
                 )
-
                 // Pushing the TexImage into the output array
                 converted_blocks.push(tex_image);
-            }catch (e){
+            } catch (e) {
                 console.debug("Error converting to SVG", e);
             }
 
             if (additional) {
-                additional.max_width = Math.max(additional.max_width, boundingRect.x +  canvas.width);
+                additional.max_width = Math.max(additional.max_width, boundingRect.x + canvas.width);
                 additional.max_height = Math.max(additional.max_height, boundingRect.y + canvas.height);
             }
         }
-
 
         return converted_blocks;
     }
@@ -410,7 +418,7 @@ export class Converter {
 
         // Xournal++ file format is a GZIP archive with an XML file inside. We need to GZIP the XML before
         // exporting it
-        const data = new Blob([exportDoc.toXml()], { type: "application/xml" });
+        const data = new Blob([exportDoc.toXml()], {type: "application/xml"});
         const compressedStream = data.stream().pipeThrough(
             new CompressionStream("gzip")
         );
