@@ -23,6 +23,9 @@
   "exportTextsLabel": {
     "message": "Esporta testi"
   },
+  "exportMathLabel": {
+    "message": "Esporta matematica"
+  },
   "exportSeparateLayersLabel": {
     "message": "Esporta in layer separati"
   },

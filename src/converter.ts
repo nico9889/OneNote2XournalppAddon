@@ -6,9 +6,10 @@ import {ConvertMessage} from "./messages/convert";
 
 const log = new Log();
 
-function convert(filename: string, strokes: boolean, images: boolean, texts: boolean, dark_page: boolean, strokes_dark_mode: boolean, texts_dark_mode: boolean, separateLayers: boolean) {
+async function convert(filename: string, strokes: boolean, images: boolean, texts: boolean, maths: boolean, dark_page: boolean, strokes_dark_mode: boolean, texts_dark_mode: boolean, maths_dark_mode: boolean, separateLayers: boolean) {
     const converter: Converter = Converter.build(log);
-    converter.convert(strokes, images, texts, separateLayers, dark_page, strokes_dark_mode, texts_dark_mode, filename);
+    await converter.convert(strokes, images, texts, maths, separateLayers, dark_page, strokes_dark_mode, texts_dark_mode, maths_dark_mode, filename);
+    converter.download();
 }
 
 
@@ -22,19 +23,21 @@ interface LogDebugMessage extends Message {
 }
  */
 
-browser.runtime.onMessage.addListener((msg) => {
+browser.runtime.onMessage.addListener(async(msg) => {
 
     const message = JSON.parse(msg.text) as (Message);
     if (message.message === 'convert') {
         const convert_message = message as ConvertMessage;
-        convert(
+        await convert(
             convert_message.filename,
             convert_message.strokes,
             convert_message.images,
             convert_message.texts,
+            convert_message.maths,
             convert_message.dark_page,
             convert_message.strokes_dark_mode,
             convert_message.texts_dark_mode,
+            convert_message.math_dark_mode,
             convert_message.separateLayers,
         );
     }

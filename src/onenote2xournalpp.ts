@@ -15,6 +15,7 @@ const fileNameInput: HTMLInputElement = document.getElementById("fileName") as (
 const exportImages: HTMLInputElement = document.getElementById("exportImages") as (HTMLInputElement);
 const exportTexts: HTMLInputElement = document.getElementById("exportTexts") as (HTMLInputElement);
 const exportStrokes: HTMLInputElement = document.getElementById("exportStrokes") as (HTMLInputElement);
+const exportMaths: HTMLInputElement = document.getElementById("exportMath") as (HTMLInputElement);
 const exportSeparateLayers: HTMLInputElement = document.getElementById("exportSeparateLayers") as (HTMLInputElement);
 const exportDarkMode: HTMLInputElement = document.getElementById("exportDarkMode") as (HTMLInputElement);
 const container: HTMLInputElement = document.getElementById('container') as HTMLInputElement;
@@ -34,18 +35,22 @@ type SettingsKeys =
     "export_images"
     | "export_texts"
     | "export_strokes"
+    | "export_maths"
     | "export_separate_layers"
     | "export_dark_page"
     | "export_strokes_dark_mode"
+    | "export_maths_dark_mode"
     | "export_texts_dark_mode";
 
 let settings: Settings = {
     export_images: exportImages?.checked || true,
     export_texts: exportTexts?.checked || true,
     export_strokes: exportStrokes?.checked || true,
+    export_maths: exportMaths?.checked || true,
     export_separate_layers: exportSeparateLayers?.checked || true,
     export_dark_page: exportDarkMode?.checked || false,
     export_strokes_dark_mode: exportDarkMode?.checked || false,
+    export_maths_dark_mode: exportDarkMode?.checked || false,
     export_texts_dark_mode: exportDarkMode?.checked || false
 };
 
@@ -78,6 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     exportImages.checked = settings.export_images;
     exportStrokes.checked = settings.export_strokes;
     exportTexts.checked = settings.export_texts;
+    exportMaths.checked = settings.export_maths;
     exportSeparateLayers.checked = settings.export_separate_layers;
     exportDarkMode.checked = settings.export_dark_page;
 
@@ -111,6 +117,7 @@ setUpdateSettingsListener(exportImages, "export_images");
 setUpdateSettingsListener(exportStrokes, "export_strokes");
 setUpdateSettingsListener(exportSeparateLayers, "export_separate_layers");
 setUpdateSettingsListener(exportTexts, "export_texts");
+setUpdateSettingsListener(exportMaths, "export_maths");
 setUpdateSettingsListener(exportDarkMode, "export_dark_page");
 setUpdateSettingsListener(exportDarkMode, "export_strokes_dark_mode");
 setUpdateSettingsListener(exportDarkMode, "export_texts_dark_mode");
@@ -211,10 +218,12 @@ exportButton?.addEventListener('click', async () => {
             dark_page: exportDarkMode?.checked ?? false,
             strokes_dark_mode: exportDarkMode?.checked ?? false,
             texts_dark_mode: exportDarkMode?.checked ?? false,
+            math_dark_mode: exportDarkMode?.checked ?? false,
             message: 'convert',
             filename: fileNameInput?.value || "",
             images: exportImages?.checked ?? true,
             texts: exportTexts?.checked ?? true,
+            maths: exportMaths?.checked ?? true,
             strokes: exportStrokes?.checked ?? true,
 
             separateLayers: exportSeparateLayers?.checked ?? true

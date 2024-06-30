@@ -1,11 +1,16 @@
 import {Text} from "../xournalpp/text";
 import {Image} from "../xournalpp/image";
 import {Stroke, Tool} from "../xournalpp/stroke";
-import {Background, BackgroundStyle, BackgroundType, Layer, Page} from "../xournalpp/page";
+import {Background, BackgroundType, Layer, Page} from "../xournalpp/page";
 import {Document} from "../xournalpp/document";
 import {Color, RGBAColor} from "../xournalpp/utils";
-import {gzip} from "pako";
 import {Log} from "../log/log";
+import {TexImage} from "../xournalpp/teximage";
+import { MathMLToLaTeX } from 'mathml-to-latex';
+
+
+const image_base64_strip = new RegExp("data:image/.*;base64,");
+
 
 export class Converter {
     private log: Log;
@@ -213,7 +218,7 @@ export class Converter {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
 
-            const data = src.replace(new RegExp("data:image/.*;base64,"), "");
+            const data = src.replace(image_base64_strip, "");
 
             const converted_image = new Image(data, x || (image_boundaries.x - offset_x), y || (image_boundaries.y - offset_y), image.width, image.height);
             converted_images.push(converted_image);
@@ -229,6 +234,81 @@ export class Converter {
         return converted_images
     }
 
+
+    // Function to "convert" raw MathML to SVG
+    mathMLToSvg(math: MathMLElement){
+        const boundingRect = math.getBoundingClientRect();
+        return `<svg xmlns="https://www.w3.org/2000/svg" width="${boundingRect.width}" height="${boundingRect.height}">
+<foreignObject width="100%" height="100%">
+    ${math.outerHTML}
+</foreignObject>
+</svg>`
+    }
+
+    private async convertMathMLBlocks(offset_x: number, offset_y: number, math_dark_mode: boolean, additional?: { max_width: number; max_height: number }) {
+        this.log.info("Converting MathML blocks");
+        const converted_blocks: TexImage[] = [] // Empty output array
+
+        // Getting math blocks from OneNote page
+        const math_containers = document.getElementsByClassName("MathSpan") as HTMLCollectionOf<HTMLSpanElement>;
+        this.log.info(`Found ${math_containers.length} MathML block(s)`);
+
+        // Preparing canvas for image conversion
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d")!;
+        for(const container of math_containers) {
+            const boundingRect = container.getBoundingClientRect();
+            const latex = MathMLToLaTeX.convert(container.innerHTML);
+            try{
+                // Moving MathML into SVG since it seems to be 100% compatible
+                const svg = this.mathMLToSvg(container.children[0] as MathMLElement);
+
+
+                // Converting to SVG to Base64 to load it as an Image
+                const img = document.createElement("img");
+                img.src = `data:image/svg+xml;base64,${btoa(encodeURI(svg))}`;
+
+                // FIXME: I'm getting error here, while trying to load the SVG image
+                //  The generated SVG string in theory is valid since browsers seems to load it
+                //  correctly if saved into a file.
+                await new Promise((resolve, reject) => {
+                   img.onload = () => (resolve(img));
+                   img.onerror = reject;
+                });
+
+                // Drawing the image into a Canvas
+                ctx.drawImage(img, 0, 0);
+
+                // Exporting the Canvas as an encoded Base64 PNG string
+                const uri = canvas.toDataURL("image/png", 0.8);
+
+                // Creating a new TexImage with dimensions and data, this object handles
+                // the XML conversion
+                const tex_image = new TexImage(
+                    latex,
+                    uri.replace(image_base64_strip, ""),
+                    boundingRect.x - offset_x,
+                    boundingRect.y - offset_y,
+                    boundingRect.x +  canvas.width,
+                    boundingRect.y + canvas.height,
+                )
+
+                // Pushing the TexImage into the output array
+                converted_blocks.push(tex_image);
+            }catch (e){
+                console.debug("Error converting to SVG", e);
+            }
+
+            if (additional) {
+                additional.max_width = Math.max(additional.max_width, boundingRect.x +  canvas.width);
+                additional.max_height = Math.max(additional.max_height, boundingRect.y + canvas.height);
+            }
+        }
+
+
+        return converted_blocks;
+    }
+
     private getTitle(): string {
         const pages = document.getElementById("OreoPageColumn") as HTMLDivElement | null;
         if (!pages) {
@@ -242,8 +322,9 @@ export class Converter {
 
     }
 
-    convert(strokes: boolean, images: boolean, texts: boolean, separateLayers: boolean, dark_page: boolean, strokes_dark_mode: boolean, texts_dark_mode: boolean, title?: string) {
+    async convert(strokes: boolean, images: boolean, texts: boolean, maths: boolean, separateLayers: boolean, dark_page: boolean, strokes_dark_mode: boolean, texts_dark_mode: boolean, math_dark_mode: boolean, title?: string) {
         this.log.info("Conversion started");
+        this.log.info(`Options:\n\tstrokes: ${strokes}\n\timages: ${images}\n\ttexts: ${texts}\n\tmaths: ${maths}`);
         // Page dimensions
         const dimension = {
             max_width: 0,
@@ -270,6 +351,8 @@ export class Converter {
         const converted_texts: Text[] = (texts) ? this.convertTexts(panel_boundaries.x, panel_boundaries.y, texts_dark_mode, dimension) : [];
         const converted_images: Image[] = (images) ? this.convertImages(panel_boundaries.x, panel_boundaries.y, dimension) : [];
         const converted_strokes: Stroke[] = (strokes) ? this.convertStrokes(strokes_dark_mode, dimension) : [];
+        const converted_math_blocks: TexImage[] = (maths) ? (await this.convertMathMLBlocks(panel_boundaries.x, panel_boundaries.y, math_dark_mode, dimension)) : [];
+
 
         this.log.info("Creating new XOPP file");
         const exportDoc = new Document(title);
@@ -287,6 +370,11 @@ export class Converter {
             this.log.info("Adding images");
             images_layer.images = converted_images;
 
+            this.log.info("Creating maths layer");
+            const maths_layer = new Layer();
+            this.log.info("Adding maths");
+            maths_layer.maths = converted_math_blocks;
+
             this.log.info("Creating texts layer");
             const texts_layer = new Layer();
             this.log.info("Adding texts");
@@ -299,8 +387,10 @@ export class Converter {
 
             this.log.info("Adding layers to the page");
             page.layers.push(images_layer);
+            page.layers.push(maths_layer);
             page.layers.push(texts_layer);
             page.layers.push(strokes_layer);
+
         } else {
             this.log.info("Creating new common layer");
             const layer = new Layer();
@@ -326,17 +416,13 @@ export class Converter {
         );
 
         const response = new Response(compressedStream);
+
+        // The GZIP file is associated to a phantom Anchor element to be exported
         this.log.info("Exporting file");
-
-        response.blob().then((blob) => {
-            // The GZIP file is associated to a phantom Anchor element to be exported
-            this.pom = document.createElement("a");
-            this.pom.setAttribute('href', URL.createObjectURL(blob));
-            this.log.success("File exported successfully");
-            this.download();
-        })
-
-
+        const blob = await response.blob();
+        this.pom = document.createElement("a");
+        this.pom.setAttribute('href', URL.createObjectURL(blob));
+        this.log.success("File exported successfully");
     }
 
     download() {

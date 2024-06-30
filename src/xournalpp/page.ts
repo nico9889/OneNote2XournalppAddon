@@ -2,6 +2,7 @@ import {Image} from "./image";
 import {Text} from "./text";
 import {Stroke} from "./stroke";
 import {Color, RGBAColor} from "./utils";
+import {TexImage} from "./teximage";
 
 export enum BackgroundType{
     Solid = "solid"
@@ -32,6 +33,7 @@ export class Layer{
     texts: Text[] = [];
     images: Image[] = [];
     strokes: Stroke[] = [];
+    maths: TexImage[] = [];
 
     constructor() {
     }
@@ -45,6 +47,9 @@ export class Layer{
             out += `${text.toXml()}\n`;
         }
         for(const image of this.images){
+            out += `${image.toXml()}\n`;
+        }
+        for(const image of this.maths){
             out += `${image.toXml()}\n`;
         }
         out += "</layer>";
