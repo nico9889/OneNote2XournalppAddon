@@ -11,17 +11,17 @@ import {MathMLToLaTeX} from 'mathml-to-latex';
 import { mathjax } from 'mathjax-full/mjs/mathjax.js'
 import { MathML} from 'mathjax-full/mjs/input/mathml.js'
 import { SVG } from 'mathjax-full/mjs/output/svg.js'
-import { liteAdaptor } from 'mathjax-full/mjs/adaptors/liteAdaptor.js'
+import { browserAdaptor } from 'mathjax-full/mjs/adaptors/browserAdaptor.js'
 import { RegisterHTMLHandler } from 'mathjax-full/mjs/handlers/html.js'
 
 
 const image_base64_strip = new RegExp("data:image/.*;base64,");
-const adaptor = liteAdaptor()
+const adaptor = browserAdaptor()
 RegisterHTMLHandler(adaptor)
 
 export class Converter {
     private log: Log;
-    adaptor = liteAdaptor();
+    adaptor = browserAdaptor();
     // Stroke need to be scaled to this size
     scaleX: number = 0.04;
     scaleY: number = 0.04;
