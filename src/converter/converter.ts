@@ -256,19 +256,19 @@ export class Converter {
         // Preparing canvas for image conversion
         const canvas = document.createElement("canvas") as HTMLCanvasElement;
         const ctx = canvas.getContext("2d")!;
+        const mathDocument = mathjax.document('', {
+            InputJax: new MathML(),
+            OutputJax: new SVG({
+                scale: 4.0,
+                mathmlSpacing: true
+            })
+        });
         for (const container of math_containers) {
             const math_element = container.children[0] as MathMLElement;
             const boundingRect = math_element.getBoundingClientRect();
             const latex = decodeURI(MathMLToLaTeX.convert(math_element.outerHTML)).replace(unsafe_xml_space, " ");
 
             try {
-                const mathDocument = mathjax.document('', {
-                    InputJax: new MathML(),
-                    OutputJax: new SVG({
-                        mathmlSpacing: true
-                    })
-                });
-
                 const node = mathDocument.convert(container.innerHTML);
 
                 const blob = new Blob([this.adaptor.innerHTML(node)], {type: "image/svg+xml;charset=utf-8"});
@@ -292,7 +292,6 @@ export class Converter {
                 ctx.drawImage(img, 0, 0, boundingRect.width, boundingRect.height);
 
                 // Exporting the Canvas as an encoded Base64 PNG string
-
                 const uri = canvas.toDataURL("image/png", 1);
 
                 // Clearing the Canvas
