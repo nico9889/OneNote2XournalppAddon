@@ -288,8 +288,8 @@ export class Converter {
                 });
 
 
-                // Drawing the image into a Canvas, dimensions are multiplied by 4 to get a crispier text
-                ctx.drawImage(img, 0, 0, boundingRect.width * 4, boundingRect.height * 4);
+                // Drawing the image into a Canvas
+                ctx.drawImage(img, 0, 0, boundingRect.width, boundingRect.height);
 
                 // Exporting the Canvas as an encoded Base64 PNG string
 
@@ -302,11 +302,13 @@ export class Converter {
                     uri.replace(image_base64_strip, ""),
                     boundingRect.x - offset_x,
                     boundingRect.y - offset_y,
-                    boundingRect.width,
-                    boundingRect.height,
+                    canvas.width,
+                    canvas.height,
                 )
+
                 // Pushing the TexImage into the output array
                 converted_blocks.push(tex_image);
+
             } catch (e) {
                 console.debug("Error converting to SVG", e);
             }
