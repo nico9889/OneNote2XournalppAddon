@@ -16,8 +16,8 @@ import { RegisterHTMLHandler } from 'mathjax-full/mjs/handlers/html.js'
 
 
 const image_base64_strip = new RegExp("data:image/.*;base64,");
-const adaptor = browserAdaptor()
-RegisterHTMLHandler(adaptor)
+const unsafe_xml_space = new RegExp(String.fromCharCode(160));
+
 
 export class Converter {
     private log: Log;
@@ -271,7 +271,7 @@ export class Converter {
 
                 const node = mathDocument.convert(container.innerHTML);
 
-                const blob = new Blob([adaptor.innerHTML(node)], {type: "image/svg+xml;charset=utf-8"});
+                const blob = new Blob([this.adaptor.innerHTML(node)], {type: "image/svg+xml;charset=utf-8"});
 
                 const url = URL.createObjectURL(blob);
 
