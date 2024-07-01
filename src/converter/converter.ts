@@ -16,7 +16,7 @@ import { RegisterHTMLHandler } from 'mathjax-full/mjs/handlers/html.js'
 
 
 const image_base64_strip = new RegExp("data:image/.*;base64,");
-const unsafe_xml_space = new RegExp(String.fromCharCode(160));
+const unsafe_xml_space = new RegExp("&nbsp;", "g");
 
 
 export class Converter {
@@ -259,7 +259,7 @@ export class Converter {
         for (const container of math_containers) {
             const math_element = container.children[0] as MathMLElement;
             const boundingRect = math_element.getBoundingClientRect();
-            const latex = MathMLToLaTeX.convert(math_element.outerHTML);
+            const latex = decodeURI(MathMLToLaTeX.convert(math_element.outerHTML)).replace(unsafe_xml_space, " ");
 
             try {
                 const mathDocument = mathjax.document('', {
