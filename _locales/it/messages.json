@@ -43,5 +43,17 @@
   },
   "reportIssueText": {
     "message": "Segnala un problema"
+  },
+  "mathQualityLabel": {
+    "message": "Qualità esport. matematica"
+  },
+  "mathLowQuality": {
+    "message": "Bassa"
+  },
+  "mathMediumQuality": {
+    "message": "Media"
+  },
+  "mathHighQuality": {
+    "message": "Alta"
   }
 }

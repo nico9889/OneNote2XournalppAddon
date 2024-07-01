@@ -8,11 +8,12 @@ import {Log} from "../log/log";
 import {TexImage} from "../xournalpp/teximage";
 import {MathMLToLaTeX} from 'mathml-to-latex';
 
-import { mathjax } from 'mathjax-full/mjs/mathjax.js'
-import { MathML} from 'mathjax-full/mjs/input/mathml.js'
-import { SVG } from 'mathjax-full/mjs/output/svg.js'
-import { browserAdaptor } from 'mathjax-full/mjs/adaptors/browserAdaptor.js'
-import { RegisterHTMLHandler } from 'mathjax-full/mjs/handlers/html.js'
+import {mathjax} from 'mathjax-full/mjs/mathjax.js'
+import {MathML} from 'mathjax-full/mjs/input/mathml.js'
+import {SVG} from 'mathjax-full/mjs/output/svg.js'
+import {browserAdaptor} from 'mathjax-full/mjs/adaptors/browserAdaptor.js'
+import {RegisterHTMLHandler} from 'mathjax-full/mjs/handlers/html.js'
+import {ConvertMessage, MathQuality} from "../messages/convert";
 
 
 const image_base64_strip = new RegExp("data:image/.*;base64,");
@@ -242,7 +243,7 @@ export class Converter {
         return converted_images
     }
 
-    private async convertMathMLBlocks(offset_x: number, offset_y: number, math_dark_mode: boolean, additional?: {
+    private async convertMathMLBlocks(offset_x: number, offset_y: number, math_dark_mode: boolean, math_quality: MathQuality, additional?: {
         max_width: number;
         max_height: number
     }) {
@@ -259,11 +260,11 @@ export class Converter {
         const mathDocument = mathjax.document('', {
             InputJax: new MathML(),
             OutputJax: new SVG({
-                scale: 4.0,
-                mathmlSpacing: true
-            })
+                mathmlSpacing: true,
+            }),
         });
         for (const container of math_containers) {
+            const fontSize = Number(window.getComputedStyle(container).fontSize.replace("px", ""));
             const math_element = container.children[0] as MathMLElement;
             const boundingRect = math_element.getBoundingClientRect();
             const latex = decodeURI(MathMLToLaTeX.convert(math_element.outerHTML)).replace(unsafe_xml_space, " ");
@@ -287,15 +288,18 @@ export class Converter {
                     img.src = url;
                 });
 
+                // Setting output image resolution scale based on user preferences (x1, x2, x4)
+                canvas.width = img.width * math_quality;
+                canvas.height = img.height * math_quality;
 
                 // Drawing the image into a Canvas
-                ctx.drawImage(img, 0, 0, boundingRect.width, boundingRect.height);
+                ctx.drawImage(img, 0, 0, boundingRect.width * math_quality, boundingRect.height * math_quality);
 
                 // Exporting the Canvas as an encoded Base64 PNG string
                 const uri = canvas.toDataURL("image/png", 1);
 
                 // Clearing the Canvas
-                ctx.clearRect(0,0, canvas.width, canvas.height);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 // Creating a new TexImage with dimensions and data, this object handles
                 // the XML conversion
@@ -303,10 +307,15 @@ export class Converter {
                     latex,
                     uri.replace(image_base64_strip, ""),
                     boundingRect.x - offset_x,
-                    boundingRect.y - offset_y,
-                    canvas.width,
-                    canvas.height,
+                    boundingRect.y - offset_y - (fontSize / 2),
+                    img.width,
+                    img.height,
                 )
+
+                if (additional) {
+                    additional.max_width = Math.max(additional.max_width, boundingRect.x + img.width);
+                    additional.max_height = Math.max(additional.max_height, boundingRect.y + img.height);
+                }
 
                 // Pushing the TexImage into the output array
                 converted_blocks.push(tex_image);
@@ -315,10 +324,7 @@ export class Converter {
                 console.error("O2X: Error converting to SVG", e);
             }
 
-            if (additional) {
-                additional.max_width = Math.max(additional.max_width, boundingRect.x + canvas.width);
-                additional.max_height = Math.max(additional.max_height, boundingRect.y + canvas.height);
-            }
+
         }
 
         return converted_blocks;
@@ -337,7 +343,20 @@ export class Converter {
 
     }
 
-    async convert(strokes: boolean, images: boolean, texts: boolean, maths: boolean, separateLayers: boolean, dark_page: boolean, strokes_dark_mode: boolean, texts_dark_mode: boolean, math_dark_mode: boolean, title?: string) {
+    async convert(message: ConvertMessage) {
+        let title = message.filename;
+        const strokes = message.strokes;
+        const texts = message.texts;
+        const images = message.images;
+        const maths = message.maths;
+        const separateLayers = message.separateLayers;
+        const dark_page = message.dark_page;
+        const strokes_dark_mode = message.strokes_dark_mode;
+        const texts_dark_mode = message.texts_dark_mode;
+        const math_dark_mode = message.math_dark_mode;
+        const math_quality = message.math_quality;
+
+
         this.log.info("Conversion started");
         this.log.info(`Options:\n\tstrokes: ${strokes}\n\timages: ${images}\n\ttexts: ${texts}\n\tmaths: ${maths}`);
         // Page dimensions
@@ -366,7 +385,7 @@ export class Converter {
         const converted_texts: Text[] = (texts) ? this.convertTexts(panel_boundaries.x, panel_boundaries.y, texts_dark_mode, dimension) : [];
         const converted_images: Image[] = (images) ? this.convertImages(panel_boundaries.x, panel_boundaries.y, dimension) : [];
         const converted_strokes: Stroke[] = (strokes) ? this.convertStrokes(strokes_dark_mode, dimension) : [];
-        const converted_math_blocks: TexImage[] = (maths) ? (await this.convertMathMLBlocks(panel_boundaries.x, panel_boundaries.y, math_dark_mode, dimension)) : [];
+        const converted_math_blocks: TexImage[] = (maths) ? (await this.convertMathMLBlocks(panel_boundaries.x, panel_boundaries.y, math_dark_mode, math_quality, dimension)) : [];
 
 
         this.log.info("Creating new XOPP file");

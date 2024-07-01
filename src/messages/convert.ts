@@ -1,5 +1,10 @@
 import {Message} from "./index";
 
+export enum MathQuality{
+    Low=1,
+    Medium=2,
+    High=4
+}
 
 export interface ConvertMessage extends Message {
     filename: string,
@@ -12,4 +17,5 @@ export interface ConvertMessage extends Message {
     strokes_dark_mode: boolean,
     texts_dark_mode: boolean,
     math_dark_mode: boolean
+    math_quality: MathQuality
 }
