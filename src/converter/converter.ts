@@ -257,6 +257,7 @@ export class Converter {
         // Preparing canvas for image conversion
         const canvas = document.createElement("canvas") as HTMLCanvasElement;
         const ctx = canvas.getContext("2d")!;
+
         const mathDocument = mathjax.document('', {
             InputJax: new MathML(),
             OutputJax: new SVG({
@@ -289,12 +290,14 @@ export class Converter {
                     }
                     img.src = url;
                 });
-
                 // Setting output image resolution scale based on user preferences (x1, x2, x4)
                 canvas.width = img.width * math_quality;
                 canvas.height = img.height * math_quality;
 
                 // Drawing the image into a Canvas
+                if(math_dark_mode) {
+                    ctx.filter = 'invert(100%)';
+                }
                 ctx.drawImage(img, 0, 0, boundingRect.width * math_quality, boundingRect.height * math_quality);
 
                 // Exporting the Canvas as an encoded Base64 PNG string
