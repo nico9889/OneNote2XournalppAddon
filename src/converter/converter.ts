@@ -295,6 +295,9 @@ export class Converter {
 
                 const uri = canvas.toDataURL("image/png", 1);
 
+                // Clearing the Canvas
+                ctx.clearRect(0,0, canvas.width, canvas.height);
+
                 // Creating a new TexImage with dimensions and data, this object handles
                 // the XML conversion
                 const tex_image = new TexImage(
