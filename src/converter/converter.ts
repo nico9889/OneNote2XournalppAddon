@@ -172,10 +172,21 @@ export class Converter {
 
                 converted_text.data = text.children[0].innerHTML;
                 converted_text.size = Number(text.style.fontSize.replace("pt", "")) ?? 12;
-                if (dark_mode) {
-                    // converted_text.color; TODO: not handled
+                const textColor = window.getComputedStyle(text).getPropertyValue("color");
+
+                let [_, r,g,b] = ["", "0", "0", "0"];
+                try{
+                    [_, r,g,b] = textColor.match(/rgb\(([0-9]{1,3}), ([0-9]{1,3}), ([0-9]{1,3})\)/)!;
+                }catch(e){
+                    console.debug(`2X: error while matching color from ${textColor}`, e);
+                }
+
+                if (dark_mode && r === "0" && g === "0" && b === "0") {
+                    converted_text.color = RGBAColor.fromColor(Color.White);
                 } else {
-                    // converted_text.color; TODO: not handled
+                    const rgba = textColor.match(/.{1,2}/g);
+                    if(rgba)
+                        converted_text.color = new RGBAColor(Number(r), Number(g), Number(b));
                 }
 
                 converted_text.x = textBoundaries.x - offset_x;
