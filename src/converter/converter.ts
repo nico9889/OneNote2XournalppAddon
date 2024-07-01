@@ -1,15 +1,28 @@
 import {Text} from "../xournalpp/text";
 import {Image} from "../xournalpp/image";
 import {Stroke, Tool} from "../xournalpp/stroke";
-import {Background, BackgroundStyle, BackgroundType, Layer, Page} from "../xournalpp/page";
+import {Background, BackgroundType, Layer, Page} from "../xournalpp/page";
 import {Document} from "../xournalpp/document";
 import {Color, RGBAColor} from "../xournalpp/utils";
-import {gzip} from "pako";
 import {Log} from "../log/log";
+import {TexImage} from "../xournalpp/teximage";
+import {MathMLToLaTeX} from 'mathml-to-latex';
+
+import {mathjax} from 'mathjax-full/mjs/mathjax.js'
+import {MathML} from 'mathjax-full/mjs/input/mathml.js'
+import {SVG} from 'mathjax-full/mjs/output/svg.js'
+import {browserAdaptor} from 'mathjax-full/mjs/adaptors/browserAdaptor.js'
+import {RegisterHTMLHandler} from 'mathjax-full/mjs/handlers/html.js'
+import {ConvertMessage, MathQuality} from "../messages/convert";
+
+
+const image_base64_strip = new RegExp("data:image/.*;base64,");
+const unsafe_xml_space = new RegExp("&nbsp;", "g");
+
 
 export class Converter {
     private log: Log;
-
+    adaptor = browserAdaptor();
     // Stroke need to be scaled to this size
     scaleX: number = 0.04;
     scaleY: number = 0.04;
@@ -27,6 +40,7 @@ export class Converter {
 
     private constructor(log: Log) {
         this.log = log;
+        RegisterHTMLHandler(this.adaptor);
     }
 
     static build(log: Log): Converter {
@@ -213,7 +227,7 @@ export class Converter {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
 
-            const data = src.replace(new RegExp("data:image/.*;base64,"), "");
+            const data = src.replace(image_base64_strip, "");
 
             const converted_image = new Image(data, x || (image_boundaries.x - offset_x), y || (image_boundaries.y - offset_y), image.width, image.height);
             converted_images.push(converted_image);
@@ -229,6 +243,93 @@ export class Converter {
         return converted_images
     }
 
+    private async convertMathMLBlocks(offset_x: number, offset_y: number, math_dark_mode: boolean, math_quality: MathQuality, additional?: {
+        max_width: number;
+        max_height: number
+    }) {
+        this.log.info("Converting MathML blocks");
+        const converted_blocks: TexImage[] = [] // Empty output array
+
+        // Getting math blocks from OneNote page
+        const math_containers = document.getElementsByClassName("MathSpan") as HTMLCollectionOf<HTMLSpanElement>;
+        this.log.info(`Found ${math_containers.length} MathML block(s)`);
+
+        // Preparing canvas for image conversion
+        const canvas = document.createElement("canvas") as HTMLCanvasElement;
+        const ctx = canvas.getContext("2d")!;
+        const mathDocument = mathjax.document('', {
+            InputJax: new MathML(),
+            OutputJax: new SVG({
+                mathmlSpacing: true,
+            }),
+        });
+        for (const container of math_containers) {
+            const fontSize = Number(window.getComputedStyle(container).fontSize.replace("px", ""));
+            const math_element = container.children[0] as MathMLElement;
+            const boundingRect = math_element.getBoundingClientRect();
+            const latex = decodeURI(MathMLToLaTeX.convert(math_element.outerHTML)).replace(unsafe_xml_space, " ");
+
+            try {
+                const node = mathDocument.convert(container.innerHTML);
+
+                const blob = new Blob([this.adaptor.innerHTML(node)], {type: "image/svg+xml;charset=utf-8"});
+
+                const url = URL.createObjectURL(blob);
+
+                // Converting to SVG to Base64 to load it as an Image
+                const img = new window.Image();
+                await new Promise((resolve, reject) => {
+                    img.onload = () => {
+                        resolve(img)
+                    };
+                    img.onerror = (e) => {
+                        reject(e)
+                    }
+                    img.src = url;
+                });
+
+                // Setting output image resolution scale based on user preferences (x1, x2, x4)
+                canvas.width = img.width * math_quality;
+                canvas.height = img.height * math_quality;
+
+                // Drawing the image into a Canvas
+                ctx.drawImage(img, 0, 0, boundingRect.width * math_quality, boundingRect.height * math_quality);
+
+                // Exporting the Canvas as an encoded Base64 PNG string
+                const uri = canvas.toDataURL("image/png", 1);
+
+                // Clearing the Canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Creating a new TexImage with dimensions and data, this object handles
+                // the XML conversion
+                const tex_image = new TexImage(
+                    latex,
+                    uri.replace(image_base64_strip, ""),
+                    boundingRect.x - offset_x,
+                    boundingRect.y - offset_y - (fontSize / 2),
+                    img.width,
+                    img.height,
+                )
+
+                if (additional) {
+                    additional.max_width = Math.max(additional.max_width, boundingRect.x + img.width);
+                    additional.max_height = Math.max(additional.max_height, boundingRect.y + img.height);
+                }
+
+                // Pushing the TexImage into the output array
+                converted_blocks.push(tex_image);
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                console.error("O2X: Error converting to SVG", e);
+            }
+
+
+        }
+
+        return converted_blocks;
+    }
+
     private getTitle(): string {
         const pages = document.getElementById("OreoPageColumn") as HTMLDivElement | null;
         if (!pages) {
@@ -242,8 +343,22 @@ export class Converter {
 
     }
 
-    convert(strokes: boolean, images: boolean, texts: boolean, separateLayers: boolean, dark_page: boolean, strokes_dark_mode: boolean, texts_dark_mode: boolean, title?: string) {
+    async convert(message: ConvertMessage) {
+        let title = message.filename;
+        const strokes = message.strokes;
+        const texts = message.texts;
+        const images = message.images;
+        const maths = message.maths;
+        const separateLayers = message.separateLayers;
+        const dark_page = message.dark_page;
+        const strokes_dark_mode = message.strokes_dark_mode;
+        const texts_dark_mode = message.texts_dark_mode;
+        const math_dark_mode = message.math_dark_mode;
+        const math_quality = message.math_quality;
+
+
         this.log.info("Conversion started");
+        this.log.info(`Options:\n\tstrokes: ${strokes}\n\timages: ${images}\n\ttexts: ${texts}\n\tmaths: ${maths}`);
         // Page dimensions
         const dimension = {
             max_width: 0,
@@ -270,6 +385,8 @@ export class Converter {
         const converted_texts: Text[] = (texts) ? this.convertTexts(panel_boundaries.x, panel_boundaries.y, texts_dark_mode, dimension) : [];
         const converted_images: Image[] = (images) ? this.convertImages(panel_boundaries.x, panel_boundaries.y, dimension) : [];
         const converted_strokes: Stroke[] = (strokes) ? this.convertStrokes(strokes_dark_mode, dimension) : [];
+        const converted_math_blocks: TexImage[] = (maths) ? (await this.convertMathMLBlocks(panel_boundaries.x, panel_boundaries.y, math_dark_mode, math_quality, dimension)) : [];
+
 
         this.log.info("Creating new XOPP file");
         const exportDoc = new Document(title);
@@ -287,6 +404,11 @@ export class Converter {
             this.log.info("Adding images");
             images_layer.images = converted_images;
 
+            this.log.info("Creating maths layer");
+            const maths_layer = new Layer();
+            this.log.info("Adding maths");
+            maths_layer.maths = converted_math_blocks;
+
             this.log.info("Creating texts layer");
             const texts_layer = new Layer();
             this.log.info("Adding texts");
@@ -299,8 +421,10 @@ export class Converter {
 
             this.log.info("Adding layers to the page");
             page.layers.push(images_layer);
+            page.layers.push(maths_layer);
             page.layers.push(texts_layer);
             page.layers.push(strokes_layer);
+
         } else {
             this.log.info("Creating new common layer");
             const layer = new Layer();
@@ -320,23 +444,19 @@ export class Converter {
 
         // Xournal++ file format is a GZIP archive with an XML file inside. We need to GZIP the XML before
         // exporting it
-        const data = new Blob([exportDoc.toXml()], { type: "application/xml" });
+        const data = new Blob([exportDoc.toXml()], {type: "application/xml"});
         const compressedStream = data.stream().pipeThrough(
             new CompressionStream("gzip")
         );
 
         const response = new Response(compressedStream);
+
+        // The GZIP file is associated to a phantom Anchor element to be exported
         this.log.info("Exporting file");
-
-        response.blob().then((blob) => {
-            // The GZIP file is associated to a phantom Anchor element to be exported
-            this.pom = document.createElement("a");
-            this.pom.setAttribute('href', URL.createObjectURL(blob));
-            this.log.success("File exported successfully");
-            this.download();
-        })
-
-
+        const blob = await response.blob();
+        this.pom = document.createElement("a");
+        this.pom.setAttribute('href', URL.createObjectURL(blob));
+        this.log.success("File exported successfully");
     }
 
     download() {

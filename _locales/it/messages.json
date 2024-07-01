@@ -23,6 +23,9 @@
   "exportTextsLabel": {
     "message": "Esporta testi"
   },
+  "exportMathLabel": {
+    "message": "Esporta matematica"
+  },
   "exportSeparateLayersLabel": {
     "message": "Esporta in layer separati"
   },
@@ -40,5 +43,17 @@
   },
   "reportIssueText": {
     "message": "Segnala un problema"
+  },
+  "mathQualityLabel": {
+    "message": "Qualità esport. matematica"
+  },
+  "mathLowQuality": {
+    "message": "Bassa"
+  },
+  "mathMediumQuality": {
+    "message": "Media"
+  },
+  "mathHighQuality": {
+    "message": "Alta"
   }
 }

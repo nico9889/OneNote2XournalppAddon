@@ -15,9 +15,11 @@ const fileNameInput: HTMLInputElement = document.getElementById("fileName") as (
 const exportImages: HTMLInputElement = document.getElementById("exportImages") as (HTMLInputElement);
 const exportTexts: HTMLInputElement = document.getElementById("exportTexts") as (HTMLInputElement);
 const exportStrokes: HTMLInputElement = document.getElementById("exportStrokes") as (HTMLInputElement);
+const exportMaths: HTMLInputElement = document.getElementById("exportMath") as (HTMLInputElement);
 const exportSeparateLayers: HTMLInputElement = document.getElementById("exportSeparateLayers") as (HTMLInputElement);
 const exportDarkMode: HTMLInputElement = document.getElementById("exportDarkMode") as (HTMLInputElement);
 const container: HTMLInputElement = document.getElementById('container') as HTMLInputElement;
+const mathQuality: HTMLSelectElement = document.getElementById("mathQuality") as HTMLSelectElement;
 
 /* TODO
 const log = document.getElementById('log');
@@ -27,26 +29,32 @@ const enableDebugButton = document.getElementById('enableDebugButton');
 */
 
 type Settings = {
-    [K in SettingsKeys]: boolean
+    [K in SettingsKeys]: boolean | number
 }
 
 type SettingsKeys =
     "export_images"
     | "export_texts"
     | "export_strokes"
+    | "export_maths"
     | "export_separate_layers"
     | "export_dark_page"
     | "export_strokes_dark_mode"
-    | "export_texts_dark_mode";
+    | "export_maths_dark_mode"
+    | "export_texts_dark_mode"
+    | "math_export_quality";
 
 let settings: Settings = {
     export_images: exportImages?.checked || true,
     export_texts: exportTexts?.checked || true,
     export_strokes: exportStrokes?.checked || true,
+    export_maths: exportMaths?.checked || true,
     export_separate_layers: exportSeparateLayers?.checked || true,
     export_dark_page: exportDarkMode?.checked || false,
     export_strokes_dark_mode: exportDarkMode?.checked || false,
-    export_texts_dark_mode: exportDarkMode?.checked || false
+    export_maths_dark_mode: exportDarkMode?.checked || false,
+    export_texts_dark_mode: exportDarkMode?.checked || false,
+    math_export_quality: 2
 };
 
 
@@ -75,12 +83,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         settings = items["o2x-settings"];
     }
 
-    exportImages.checked = settings.export_images;
-    exportStrokes.checked = settings.export_strokes;
-    exportTexts.checked = settings.export_texts;
-    exportSeparateLayers.checked = settings.export_separate_layers;
-    exportDarkMode.checked = settings.export_dark_page;
-
+    exportImages.checked = Boolean(settings.export_images);
+    exportStrokes.checked = Boolean(settings.export_strokes);
+    exportTexts.checked = Boolean(settings.export_texts);
+    exportMaths.checked = Boolean(settings.export_maths);
+    exportSeparateLayers.checked = Boolean(settings.export_separate_layers);
+    exportDarkMode.checked = Boolean(settings.export_dark_page);
+    mathQuality.value = String(settings.math_export_quality);
 
     /* TODO
     const item = await browser.storage.local.get(['o2x-log-debug', 'o2x-log-show']);
@@ -107,13 +116,22 @@ function setUpdateSettingsListener(input: HTMLInputElement, settings_key: Settin
     });
 }
 
+function setUpdateSettingsSelectListener(input: HTMLSelectElement, settings_key: SettingsKeys) {
+    input.addEventListener("change", async () => {
+        settings[settings_key] = Number(input.value);
+        await browser.storage.local.set({"o2x-settings": settings});
+    });
+}
+
 setUpdateSettingsListener(exportImages, "export_images");
 setUpdateSettingsListener(exportStrokes, "export_strokes");
 setUpdateSettingsListener(exportSeparateLayers, "export_separate_layers");
 setUpdateSettingsListener(exportTexts, "export_texts");
+setUpdateSettingsListener(exportMaths, "export_maths");
 setUpdateSettingsListener(exportDarkMode, "export_dark_page");
 setUpdateSettingsListener(exportDarkMode, "export_strokes_dark_mode");
 setUpdateSettingsListener(exportDarkMode, "export_texts_dark_mode");
+setUpdateSettingsSelectListener(mathQuality, "math_export_quality");
 
 
 /* TODO
@@ -211,12 +229,14 @@ exportButton?.addEventListener('click', async () => {
             dark_page: exportDarkMode?.checked ?? false,
             strokes_dark_mode: exportDarkMode?.checked ?? false,
             texts_dark_mode: exportDarkMode?.checked ?? false,
+            math_dark_mode: exportDarkMode?.checked ?? false,
             message: 'convert',
             filename: fileNameInput?.value || "",
             images: exportImages?.checked ?? true,
             texts: exportTexts?.checked ?? true,
+            maths: exportMaths?.checked ?? true,
             strokes: exportStrokes?.checked ?? true,
-
+            math_quality: Number(mathQuality.value) ?? 2,
             separateLayers: exportSeparateLayers?.checked ?? true
         }
         await browser.tabs.sendMessage(tab?.id ?? 0, {

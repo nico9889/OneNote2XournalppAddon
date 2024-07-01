@@ -23,7 +23,9 @@
                         <span class="text-muted" o2x-i18n="emptyNameInfo">If empty it takes the name of the OneNote document</span>
                     </div>
                     <div class="col">
-                        <button type="button" class="btn border-color m-3" id="exportButton" o2x-i18n="exportButton">Export</button>
+                        <button type="button" class="btn border-color m-3" id="exportButton" o2x-i18n="exportButton">
+                            Export
+                        </button>
                     </div>
                 </div>
             </div>
@@ -34,27 +36,35 @@
 
                         <div class="form-checkbox">
                             <input type="checkbox" checked id="exportStrokes">
-                            <label class="checkbox-text" for="exportStrokes" o2x-i18n="exportStrokesLabel">Export strokes</label>
+                            <label class="checkbox-text" for="exportStrokes" o2x-i18n="exportStrokesLabel">Export
+                                strokes</label>
                         </div>
                         <div class="form-checkbox">
                             <input type="checkbox" checked id="exportImages">
-                            <label class="checkbox-text" for="exportImages" o2x-i18n="exportImagesLabel">Export images</label>
+                            <label class="checkbox-text" for="exportImages" o2x-i18n="exportImagesLabel">Export
+                                images</label>
                         </div>
                         <div class="form-checkbox">
                             <input type="checkbox" checked id="exportTexts">
-                            <label class="checkbox-text" for="exportTexts" o2x-i18n="exportTextsLabel">Export texts</label>
+                            <label class="checkbox-text" for="exportTexts" o2x-i18n="exportTextsLabel">Export
+                                texts</label>
+                        </div>
+                        <div class="form-checkbox">
+                            <input type="checkbox" checked id="exportMath">
+                            <label class="checkbox-text" for="exportMath" o2x-i18n="exportMathLabel">Export math</label>
                         </div>
                         <div class="form-checkbox">
                             <input type="checkbox" checked id="exportSeparateLayers">
-                            <label class="checkbox-text" for="exportSeparateLayers" o2x-i18n="exportSeparateLayersLabel">Export in separate layers</label>
+                            <label class="checkbox-text" for="exportSeparateLayers"
+                                   o2x-i18n="exportSeparateLayersLabel">Export in separate layers</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-checkbox">
                             <input type="checkbox" id="exportDarkMode">
-                            <label class="checkbox-text" for="exportDarkMode" o2x-i18n="exportDarkModeLabel">Dark mode</label>
+                            <label class="checkbox-text" for="exportDarkMode" o2x-i18n="exportDarkModeLabel">Dark
+                                mode</label>
                         </div>
-
                         <!-- TODO
                         <h4>Log options: </h4>
                         <button id="openLogButton" class="btn border-color my-1">Open/Close Log</button>
@@ -65,7 +75,14 @@
 
                     </div>
                 </div>
-
+                <div class="row">
+                    <label for="mathQuality" o2x-i18n="mathQualityLabel" class="px-1">Math Export Quality</label>
+                    <select id="mathQuality">
+                        <option value="1" o2x-i18n="mathLowQuality">Low</option>
+                        <option value="2" o2x-i18n="mathMediumQuality" selected>Medium</option>
+                        <option value="4" o2x-i18n="mathHighQuality">High</option>
+                    </select>
+                </div>
             </div>
         </div>
         <!-- TODO
@@ -126,7 +143,8 @@
     </div>
     <div class="row">
         <div class="col">
-        <a href="https://github.com/nico9889/OneNote2XournalppAddon/wiki/Internationalization" target="_blank">Help with translations!</a>
+            <a href="https://github.com/nico9889/OneNote2XournalppAddon/wiki/Internationalization" target="_blank">Help
+                with translations!</a>
         </div>
     </div>
 </footer>
