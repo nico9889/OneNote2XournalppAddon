@@ -312,7 +312,7 @@ export class Converter {
                 converted_blocks.push(tex_image);
 
             } catch (e) {
-                console.debug("Error converting to SVG", e);
+                console.error("O2X: Error converting to SVG", e);
             }
 
             if (additional) {
