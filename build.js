@@ -8,7 +8,7 @@ fs.rmSync('./dist', {recursive: true, force: true});
 // Bundling minified JS
 await esbuild.build({
     entryPoints: [
-        "./src/converter.ts",
+        "./src/content.ts",
         "./src/onenote2xournalpp.ts",
     ],
     format: 'cjs',

@@ -22,7 +22,7 @@
       ],
       "all_frames": true,
       "js": [
-        "converter.js"
+        "content.js"
       ]
     }
   ],
