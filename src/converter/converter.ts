@@ -261,6 +261,8 @@ export class Converter {
             InputJax: new MathML(),
             OutputJax: new SVG({
                 mathmlSpacing: true,
+                fontCache: 'local',
+                internalSpeechTitles: false
             }),
         });
         for (const container of math_containers) {
