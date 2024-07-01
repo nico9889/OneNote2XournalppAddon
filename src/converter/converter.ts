@@ -310,7 +310,7 @@ export class Converter {
 
                 // Pushing the TexImage into the output array
                 converted_blocks.push(tex_image);
-
+                URL.revokeObjectURL(url);
             } catch (e) {
                 console.error("O2X: Error converting to SVG", e);
             }
