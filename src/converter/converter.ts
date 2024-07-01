@@ -264,10 +264,13 @@ export class Converter {
             try {
                 const mathDocument = mathjax.document('', {
                     InputJax: new MathML(),
-                    OutputJax: new SVG({ fontCache: 'local' })
+                    OutputJax: new SVG({
+                        mathmlSpacing: true
+                    })
                 });
 
                 const node = mathDocument.convert(container.innerHTML);
+
                 const blob = new Blob([adaptor.innerHTML(node)], {type: "image/svg+xml;charset=utf-8"});
 
                 const url = URL.createObjectURL(blob);
