@@ -29,7 +29,7 @@ export function convertTexts(offsets: Offsets, dark_mode: boolean, page_size: Pa
             try{
                 [_, r,g,b] = textColor.match(COLOR_REGEXP)!;
             }catch(e){
-                console.debug(`2X: error while matching color from ${textColor}`, e);
+                console.debug(`O2X: error while matching color from ${textColor}`, e);
             }
 
             if (dark_mode && r === "0" && g === "0" && b === "0") {
