@@ -141,6 +141,7 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
         const layer = new Layer();
         LOG.info("Adding elements to the layer");
         layer.images = converted_images;
+        layer.maths = converted_math_blocks;
         layer.texts = converted_texts;
         layer.strokes = converted_strokes;
 
