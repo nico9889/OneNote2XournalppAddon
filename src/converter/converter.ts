@@ -188,4 +188,5 @@ export function downloadDocument(document: DownloadableDocument) {
 
     document.pom.setAttribute('download', `${sanitizeFileName(document.title)}.xopp`);
     document.pom?.click();
+    document.pom.click();
 }
