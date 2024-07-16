@@ -1,10 +1,7 @@
 import browser from "webextension-polyfill";
-import {Converter} from "./converter/converter";
-import {Log} from "./log/log";
+import {convertNote, downloadDocument} from "./converter/converter";
 import {Message} from "./messages";
 import {ConvertMessage} from "./messages/convert";
-
-const log = new Log();
 
 /* TODO
 interface LogEnableMessage extends Message {
@@ -19,9 +16,8 @@ interface LogDebugMessage extends Message {
 browser.runtime.onMessage.addListener(async(msg) => {
     const message = JSON.parse(msg.text) as (Message);
     if (message.message === 'convert') {
-        const converter: Converter = Converter.build(log);
-        await converter.convert(message as ConvertMessage);
-        converter.download();
+        const document = await convertNote(message as ConvertMessage);
+        await downloadDocument(document);
     }
 
     /* TODO
