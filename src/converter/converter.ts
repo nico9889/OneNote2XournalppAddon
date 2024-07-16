@@ -120,22 +120,22 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
         LOG.info("Creating images layer");
         page.layers.push(new Layer());
         LOG.info("Adding images");
-        page.layers[-1].images = converted_images;
+        page.layers.at(-1)!.images = converted_images;
 
         LOG.info("Creating maths layer");
         page.layers.push(new Layer());
         LOG.info("Adding maths");
-        page.layers[-1].maths = converted_math_blocks;
+        page.layers.at(-1)!.maths = converted_math_blocks;
 
         LOG.info("Creating texts layer");
         page.layers.push(new Layer());
         LOG.info("Adding texts");
-        page.layers[-1].texts = converted_texts;
+        page.layers.at(-1)!.texts = converted_texts;
 
         LOG.info("Creating strokes layer");
         page.layers.push(new Layer());
         LOG.info("Adding strokes")
-        page.layers[-1].strokes = converted_strokes;
+        page.layers.at(-1)!.strokes = converted_strokes;
     } else {
         LOG.info("Creating new common layer");
         const layer = new Layer();
