@@ -9,6 +9,7 @@ export function convertTexts(offsets: Offsets, dark_mode: boolean, page_size: Pa
     const texts = document.getElementsByClassName("TextRun") as HTMLCollectionOf<HTMLSpanElement>;
     const converted_texts: Text[] = [];
     LOG.info(`Found ${texts.length} text(s)`);
+
     for (const text of texts) {
         if (text.children[0]?.innerHTML) {
             const textBoundaries = text.getBoundingClientRect();
@@ -18,7 +19,7 @@ export function convertTexts(offsets: Offsets, dark_mode: boolean, page_size: Pa
             let complete_text = "";
             for(let child of text.children){
                 if(child.classList.contains("SpellingError") || child.classList.contains("NormalTextRun")){
-                    complete_text = complete_text+child.innerHTML;
+                    complete_text = complete_text+decodeURIComponent((child as HTMLElement).innerText);
                 }
             }
             converted_text.data = complete_text;
