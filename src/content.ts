@@ -17,7 +17,7 @@ browser.runtime.onMessage.addListener(async(msg) => {
     const message = JSON.parse(msg.text) as (Message);
     if (message.message === 'convert') {
         const document = await convertNote(message as ConvertMessage);
-        await downloadDocument(document);
+        downloadDocument(document);
     }
 
     /* TODO
