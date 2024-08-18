@@ -186,8 +186,6 @@ export function downloadDocument(document: DownloadableDocument) {
         LOG.error("No file converted. Cannot download.");
         return;
     }
-
     document.pom.setAttribute('download', `${sanitizeFileName(document.title)}.xopp`);
-    document.pom?.click();
     document.pom.click();
 }
