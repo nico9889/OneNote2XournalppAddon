@@ -1,4 +1,5 @@
 name: 🌐 Language Request
+description: Use this template if you want to translate this addon in a new language
 title: "[LANGUAGE REQUEST] I need the translation files for $Language"
 labels: ["question"]
 assignees:
