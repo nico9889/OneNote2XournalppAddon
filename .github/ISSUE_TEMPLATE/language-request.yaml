@@ -1,0 +1,34 @@
+name: 🌐 Language Request
+title: "[LANGUAGE REQUEST] I need the translation files for $Language"
+labels: ["question"]
+assignees:
+  - nico9889
+body:
+- type: checkboxes
+  attributes:
+    label: Did you read the dedicated [Wiki page](https://github.com/nico9889/OneNote2XournalppAddon/wiki/Internationalization):**? If not please do it!
+    description: I'm just checking that you read the instruction before proceeding. Please do not mark this as done if you haven't :)
+    render: markdown
+  options:
+    - label: I have searched the existing issues
+      required: true
+- type: textarea
+  attributes:
+    label: Requested Language
+    description: Please specify in which language you want to translate the addon
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Language codes
+    description: Please paste this [`window.navigator.languages`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/languages) in your browser developer console (press F12) and copy the output here, so I can create the needed files. The output should look like this `['it-IT', 'it', 'en-US', 'en']`. If you can please remove the extra ones, like `en-US` and `en` in this example, otherwise I will do this myself based on your first answer.
+    render: markdown
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Anything else?
+    description: If you have any other question please make them down here :)
+    render: markdown
+  validations:
+    required: false
