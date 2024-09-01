@@ -10,6 +10,8 @@ document.querySelectorAll<HTMLElement>('[o2x-i18n]').forEach((el) => {
 });
 
 // Input zone
+const appSettings: HTMLDivElement = document.getElementById("appSettings") as HTMLDivElement;
+const restrictedPages: HTMLSpanElement = document.getElementById("restrictedPages") as HTMLSpanElement;
 const exportButton: HTMLButtonElement = document.getElementById("exportButton") as HTMLButtonElement;
 const fileNameInput: HTMLInputElement = document.getElementById("fileName") as (HTMLInputElement);
 const exportImages: HTMLInputElement = document.getElementById("exportImages") as (HTMLInputElement);
@@ -62,6 +64,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
     if (!tab.url?.startsWith('https://onedrive.live.com/')
         && !tab.url?.match("https:\\/\\/[a-zA-Z0-9-]+\\.sharepoint\\.com.*$")) {
+        if(appSettings){
+            appSettings.outerHTML = "";
+        }
         if (container) {
             container.innerHTML = '';
             const error = document.createElement("span");
@@ -69,6 +74,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             error.innerText = browser.i18n.getMessage("restrictedPages");
             container.append(error);
         }
+    }else{
+        if(restrictedPages)
+            restrictedPages.outerHTML = "";
     }
     writeLine(
         {
