@@ -7,9 +7,8 @@ assignees:
 body:
 - type: checkboxes
   attributes:
-    label: Did you read the dedicated [Wiki page](https://github.com/nico9889/OneNote2XournalppAddon/wiki/Internationalization)? If not please do it!
-    description: I'm just checking that you read the instruction before proceeding. Please do not mark this as done if you haven't :)
-    render: markdown
+    label: Did you read the dedicated Wiki page? If not please do it!
+    description: I'm just checking that you read the instruction (https://github.com/nico9889/OneNote2XournalppAddon/wiki/Internationalization) before proceeding. Please do not mark this as done if you haven't :) 
     options:
       - label: I have read the Wiki
         required: true
