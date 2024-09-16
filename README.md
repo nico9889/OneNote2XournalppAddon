@@ -1,5 +1,7 @@
 # OneNote2XournalppAddon
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F52OY0N)
+
 [![Get on Addons Mozilla Online](https://extensionworkshop.com/assets/img/documentation/publish/get-the-addon-178x60px.dad84b42.png)](https://addons.mozilla.org/it/firefox/addon/onenote-to-xournal/)
 [![Get on Chrome Web Store](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/UV4C4ybeBTsZt43U4xis.png)](https://chrome.google.com/webstore/detail/onenote-to-xournal%20%20/lbghdcdjdfngepdkmmemagflaekkmjmf)
 
@@ -28,7 +30,7 @@ There are a few steps that are required to get an optimal result:
 * Open the notes that you want to convert
 * Scroll the notes down to the bottom. This step is needed because OneNote loads images and strokes lazily, doing that you force it to download them all.
 * Scroll the notes up again. This is required because the script uses some position relative data to calculate the actual position of the elements.
-* Press the addon button on your Toolbar and wait...
+* Press the addon button on your Toolbar and click "Export"...
 
 Once the page is converted a "_download_" will start automatically.
 
@@ -65,5 +67,5 @@ This command creates a "dist" directory with the reduced JS file and the assets
 ``` bash
 npm run pack
 ```
-
 This command creates a "web-ext-artifacts" directory with the contents of "dist" zipped, ready to be installed on Firefox.
+
