@@ -44,7 +44,7 @@ export class Text {
 
 
     toXml(){
-        const out = wrapText(escapeXml(this.data), this.size, this.width);
+        const out = escapeXml(wrapText(this.data, this.size, this.width));
         return `<text font="${this.font}" size="${this.size.toFixed(0)}" x="${this.x.toFixed(4)}" y="${this.y.toFixed(4)}" color="${this.color.toString()}" ts="${this.ts}" fn="${this.fn}">${out}</text> `
     }
 }
