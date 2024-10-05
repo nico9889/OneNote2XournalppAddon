@@ -28,7 +28,7 @@ export function convertTexts(offsets: Offsets, dark_mode: boolean, page_size: Pa
 
             let [_, r,g,b] = ["", "0", "0", "0"];
             try{
-                [_, r,g,b] = textColor.match(COLOR_REGEXP)!;
+                [_, r,g,b] = textColor.match(COLOR_REGEXP) || ["", "0", "0", "0"];
             }catch(e){
                 console.debug(`O2X: error while matching color from ${textColor}`, e);
             }
