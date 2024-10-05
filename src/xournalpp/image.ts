@@ -1,4 +1,4 @@
-export class Image{
+export class Image {
     data: string = "";
     left: number = 0;
     right: number = 0;
@@ -13,7 +13,10 @@ export class Image{
         this.bottom = (y + height);
     }
 
-    toXml(){
-        return (this.data) ? `<image left="${this.left.toFixed(4)}" right="${this.right.toFixed(4)}" top="${this.top.toFixed(4)}" bottom="${this.bottom.toFixed(4)}">${this.data}</image>`: "";
+    toXml() {
+        if (!this.data) {
+            return ""
+        }
+        return `<image left="${this.left.toFixed(4)}" right="${this.right.toFixed(4)}" top="${this.top.toFixed(4)}" bottom="${this.bottom.toFixed(4)}">${this.data}</image>`;
     }
 }

@@ -15,6 +15,9 @@ export class TexImage extends Image{
     }
 
     toXml(){
-        return (this.data) ? `<teximage text="${this.text}" left="${this.left.toFixed(4)}" right="${this.right.toFixed(4)}" top="${this.top.toFixed(4)}" bottom="${this.bottom.toFixed(4)}">${this.data}</teximage>`: "";
+        if(!this.data){
+            return "";
+        }
+        return `<teximage text="${this.text}" left="${this.left.toFixed(4)}" right="${this.right.toFixed(4)}" top="${this.top.toFixed(4)}" bottom="${this.bottom.toFixed(4)}">${this.data}</teximage>`
     }
 }
