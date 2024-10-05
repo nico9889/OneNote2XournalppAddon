@@ -55,5 +55,11 @@
   },
   "mathHighQuality": {
     "message": "High"
+  },
+  "versionLabel": {
+    "message": "Version:"
+  },
+  "changelogHref": {
+    "message": "Changelog"
   }
 }

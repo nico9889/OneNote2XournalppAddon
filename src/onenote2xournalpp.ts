@@ -22,6 +22,7 @@ const exportSeparateLayers: HTMLInputElement = document.getElementById("exportSe
 const exportDarkMode: HTMLInputElement = document.getElementById("exportDarkMode") as (HTMLInputElement);
 const container: HTMLInputElement = document.getElementById('container') as HTMLInputElement;
 const mathQuality: HTMLSelectElement = document.getElementById("mathQuality") as HTMLSelectElement;
+const semanticVersion: HTMLSpanElement = document.getElementById("semanticVersion") as HTMLSpanElement;
 
 /* TODO
 const log = document.getElementById('log');
@@ -61,6 +62,9 @@ let settings: Settings = {
 
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const manifestData = browser.runtime.getManifest();
+    semanticVersion.innerText = " " + manifestData.version;
+
     const tab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
     if (!tab.url?.startsWith('https://onedrive.live.com/')
         && !tab.url?.match("https:\\/\\/[a-zA-Z0-9-]+\\.sharepoint\\.com.*$")) {
