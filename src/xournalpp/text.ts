@@ -1,5 +1,27 @@
 import {Color, RGBAColor} from "./utils";
 
+export function escapeXml(data: string) {
+    return data.replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+}
+
+export function wrapText(data: string, fontSize: number, width: number): string {
+    let out = "";
+    let space = 0;
+    for(let i=0;i<data.length;i++){
+        out+= data[i];
+        space += fontSize;
+        if(space > width * 1.8){
+            space = 0;
+            out += "\n";
+        }
+    }
+    return out;
+}
+
 export class Text {
     color: RGBAColor;
     data: string = "";
@@ -19,34 +41,10 @@ export class Text {
         this.size = size;
     }
 
-    wrap(){
-        let out = "";
-        let space = 0;
-        for(let i=0;i<this.data.length;i++){
-            out+= this.data[i];
-            space += this.size;
-            if(space > this.width * 1.8){
-                space = 0;
-                out += "\n";
-            }
-        }
-        this.data = out;
-    }
-
-    escape(){
-        // FIXME: dirty escape
-        this.data = this.data.replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&apos;');
-    }
-
 
 
     toXml(){
-        this.wrap();
-        this.escape();
-        return `<text font="${this.font}" size="${this.size.toFixed(0)}" x="${this.x.toFixed(4)}" y="${this.y.toFixed(4)}" color="${this.color.toString()}" ts="${this.ts}" fn="${this.fn}">${this.data}</text> `
+        const out = wrapText(escapeXml(this.data), this.size, this.width);
+        return `<text font="${this.font}" size="${this.size.toFixed(0)}" x="${this.x.toFixed(4)}" y="${this.y.toFixed(4)}" color="${this.color.toString()}" ts="${this.ts}" fn="${this.fn}">${out}</text> `
     }
 }
