@@ -54,7 +54,7 @@ export function convertStrokes(dark_mode: boolean, page_size: PageSize): Stroke[
             const color = (colors) ? new RGBAColor(Number(colors[1]), Number(colors[2]), Number(colors[3]), Math.round(opacity * 255)) : base_color;
 
             // OneNote stroke width, rounded to 2 decimal positions, defaults to 1 if not found
-            const width = Math.round(Number(path.getAttribute("stroke-width")) * STROKE_SCALE * 100) / 100 ?? 1;
+            const width = Math.round(Number(path.getAttribute("stroke-width")) * STROKE_SCALE * 100) / 100;
 
 
             for (let i = 0; i < directives.length; i++) {
