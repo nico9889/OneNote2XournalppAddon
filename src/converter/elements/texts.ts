@@ -4,7 +4,7 @@ import {Color, RGBAColor} from "../../xournalpp/utils";
 
 
 
-export function convertTexts(offsets: Offsets, dark_mode: boolean, page_size: PageSize){
+export function convertTexts(offsets: Offsets, dark_mode: boolean, page_size: PageSize, zoom_level: number): Text[] {
     LOG.info("Converting texts");
     const texts = document.getElementsByClassName("TextRun") as HTMLCollectionOf<HTMLSpanElement>;
     const converted_texts: Text[] = [];
@@ -41,19 +41,18 @@ export function convertTexts(offsets: Offsets, dark_mode: boolean, page_size: Pa
                     converted_text.color = new RGBAColor(Number(r), Number(g), Number(b));
             }
 
-            converted_text.x = textBoundaries.x - offsets.x;
-            converted_text.y = textBoundaries.y - offsets.y;
-            converted_text.width = textBoundaries.width;
+            converted_text.x = (textBoundaries.x - offsets.x) / zoom_level;
+            converted_text.y = (textBoundaries.y - offsets.y) / zoom_level;
 
+            // FIXME: zoom_level * 0.8 resulted out from trial&error, it may be wrong...
+            converted_text.width = (textBoundaries.width) / (zoom_level * 0.8);
 
             converted_texts.push(converted_text);
 
             // Inelegant solution to export texts max_width and max_height by side effect without
             // scanning multiple times all the texts
-            if (page_size) {
-                page_size.width = Math.max(page_size.width, converted_text.x + textBoundaries.width);
-                page_size.height = Math.max(page_size.height, converted_text.y + textBoundaries.height);
-            }
+            page_size.width = Math.max(page_size.width, converted_text.x + converted_text.width) ;
+            page_size.height = Math.max(page_size.height, converted_text.y + (textBoundaries.height / zoom_level));
 
         }
     }
