@@ -56,7 +56,7 @@ function getZoomLevel() {
     if (!style) {
         return 1.0;
     }
-    const matches = style.match("scale\\(([0-9]+\.?[0-9]*)\\)");
+    const matches = style.match("scale\\(([0-9]+\\.?[0-9]*)\\)");
     if (!matches) {
         return 1.0;
     }
