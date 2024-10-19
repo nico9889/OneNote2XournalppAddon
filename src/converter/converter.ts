@@ -47,6 +47,22 @@ function getTitle() {
     return page.innerText;
 }
 
+function getZoomLevel() {
+    const origin = document.getElementsByClassName("PageContentOrigin")[0];
+    if (!origin) {
+        return 1.0;
+    }
+    const style = origin.getAttribute("style");
+    if (!style) {
+        return 1.0;
+    }
+    const matches = style.match("scale\\(([0-9]+\.?[0-9]*)\\)");
+    if (!matches) {
+        return 1.0;
+    }
+    return Number.parseFloat(matches[1] ?? "1.0");
+}
+
 export async function convertNote(message: ConvertMessage): Promise<DownloadableDocument> {
     let title = message.filename;
     const strokes = message.strokes;
@@ -93,11 +109,12 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
         y: panel_boundaries.y
     }
 
-    const converted_texts: Text[] = (texts) ? convertTexts(offsets, texts_dark_mode, page_size) : [];
-    const converted_images: Image[] = (images) ? convertImages(offsets, page_size) : [];
-    const converted_strokes: Stroke[] = (strokes) ? convertStrokes(strokes_dark_mode, page_size) : [];
-    const converted_math_blocks: TexImage[] = (maths) ? (await convertMathMLBlocks(offsets, math_dark_mode, math_quality, page_size)) : [];
+    const zoom_level = getZoomLevel();
 
+    const converted_texts: Text[] = (texts) ? convertTexts(offsets, texts_dark_mode, page_size, zoom_level) : [];
+    const converted_images: Image[] = (images) ? convertImages(offsets, page_size, zoom_level) : [];
+    const converted_strokes: Stroke[] = (strokes) ? convertStrokes(strokes_dark_mode, page_size, zoom_level) : [];
+    const converted_math_blocks: TexImage[] = (maths) ? (await convertMathMLBlocks(offsets, math_dark_mode, math_quality, page_size, zoom_level)) : [];
 
     // Creates a new Xournal++ document
     LOG.info("Creating new XOPP file");

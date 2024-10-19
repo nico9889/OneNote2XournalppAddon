@@ -6,7 +6,7 @@ const SCALE_X = 0.04;
 const SCALE_Y = 0.04;
 const STROKE_SCALE = 0.04;
 
-export function convertStrokes(dark_mode: boolean, page_size: PageSize): Stroke[] {
+export function convertStrokes(dark_mode: boolean, page_size: PageSize, zoom_level: number): Stroke[] {
     LOG.info("Converting strokes");
     const converted_strokes: Stroke[] = [];
     const strokes = document.getElementsByClassName("InkStrokeOuterElement") as HTMLCollectionOf<SVGElement>;
@@ -14,15 +14,6 @@ export function convertStrokes(dark_mode: boolean, page_size: PageSize): Stroke[
     const base_color = (dark_mode) ? Color.White : Color.Black;
 
     for (const stroke of strokes) {
-        const strokeBoundaries = stroke.getBoundingClientRect();
-
-        // Inelegant solution to export strokes max_width and max_height by side effect without
-        // scanning multiple times all the strokes
-        if (page_size) {
-            page_size.width = Math.max(page_size.width, strokeBoundaries.x + strokeBoundaries.width);
-            page_size.height = Math.max(page_size.height, strokeBoundaries.y + strokeBoundaries.height);
-        }
-
         // SVG ViewBox, shifts the stroke into a specific direction
         const view_box_string = stroke.getAttribute("viewBox");
         const view_box_values = view_box_string?.split(" ");
@@ -62,6 +53,8 @@ export function convertStrokes(dark_mode: boolean, page_size: PageSize): Stroke[
                 // Xournal strokes representation doesn't permit empty spaces/skips, so we need to split the SVG Path into
                 // multiple strokes in case of movements
                 if (directive === "M") {
+                    // Inelegant solution to export strokes max_width and max_height by side effect without
+                    // scanning multiple times all the strokes
                     stroke = new Stroke();
                     stroke.width = width;
                     stroke.color = color;
@@ -88,18 +81,25 @@ export function convertStrokes(dark_mode: boolean, page_size: PageSize): Stroke[
                         const old_coords = stroke.coords[stroke.coords.length - 1];
                         const next_x = old_coords[0] + (x * SCALE_X);
                         const next_y = old_coords[1] + (y * SCALE_Y);
+
+                        page_size.width = Math.max(page_size.width, next_x);
+                        page_size.height = Math.max(page_size.height, next_y);
                         stroke.coords.push([next_x, next_y]);
                         x = parseInt(directives[i]);
                         y = parseInt(directives[i + 1]);
                         i += 2;
                     }
                     i -= 3;
+                } else if (directive == " " || directive == "") {
+                    // Added to avoid false warnings
                 } else {
                     // Skips unmanaged directives, warning the user that this value has been unused
                     // so if it was useful it can be reported
                     LOG.debug(`Skipping unrecognised stroke directive: ${directives[i]}`);
+
                 }
             }
+
         } else {
             LOG.warn(`Invalid stroke detected: missing 'd' in ${path}`);
         }

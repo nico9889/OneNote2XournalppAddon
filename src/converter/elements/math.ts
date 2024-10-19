@@ -20,7 +20,7 @@ function sanitize_latex(latex: string): string{
 const ADAPTOR = browserAdaptor();
 RegisterHTMLHandler(ADAPTOR);
 
-export async function convertMathMLBlocks(offsets: Offsets, math_dark_mode: boolean, math_quality: MathQuality, page_size: PageSize) {
+export async function convertMathMLBlocks(offsets: Offsets, math_dark_mode: boolean, math_quality: MathQuality, page_size: PageSize, zoom_level: number) {
     LOG.info("Converting MathML blocks");
     const converted_blocks: TexImage[] = [] // Empty output array
 
@@ -65,8 +65,8 @@ export async function convertMathMLBlocks(offsets: Offsets, math_dark_mode: bool
                 img.src = url;
             });
             // Setting output image resolution scale based on user preferences (x1, x2, x4)
-            canvas.width = img.width * math_quality;
-            canvas.height = img.height * math_quality;
+            canvas.width = img.width * math_quality * zoom_level;
+            canvas.height = img.height * math_quality * zoom_level;
 
             // Drawing the image into a Canvas
             if(math_dark_mode) {
@@ -85,16 +85,14 @@ export async function convertMathMLBlocks(offsets: Offsets, math_dark_mode: bool
             const tex_image = new TexImage(
                 latex,
                 uri.replace(IMAGE_BASE64_REGEXP, ""),
-                boundingRect.x - offsets.x,
-                boundingRect.y - offsets.y - (fontSize / 2),
+                (boundingRect.x - offsets.x) / zoom_level,
+                (boundingRect.y - offsets.y - (fontSize / 2)) / zoom_level,
                 img.width,
                 img.height,
             )
 
-            if (page_size) {
-                page_size.width = Math.max(page_size.width, boundingRect.x + img.width);
-                page_size.height = Math.max(page_size.height, boundingRect.y + img.height);
-            }
+            page_size.width = Math.max(page_size.width, (boundingRect.x + img.width)  / zoom_level);
+            page_size.height = Math.max(page_size.height, (boundingRect.y + img.height)  / zoom_level);
 
             // Pushing the TexImage into the output array
             converted_blocks.push(tex_image);
