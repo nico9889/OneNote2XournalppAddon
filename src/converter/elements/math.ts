@@ -86,7 +86,7 @@ export async function convertMathMLBlocks(offsets: Offsets, math_dark_mode: bool
                 latex,
                 uri.replace(IMAGE_BASE64_REGEXP, ""),
                 (boundingRect.x - offsets.x) / zoom_level,
-                (boundingRect.y - offsets.y - (fontSize / 2)) / zoom_level,
+                (boundingRect.y - offsets.y) / zoom_level - (fontSize / 2),
                 img.width,
                 img.height,
             )
