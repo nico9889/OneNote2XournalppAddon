@@ -105,8 +105,8 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
     }
     const panel_boundaries = panel.getBoundingClientRect();
     const offsets = {
-        x: panel_boundaries.x,
-        y: panel_boundaries.y
+        x: panel_boundaries.x - panel.scrollLeft,
+        y: panel_boundaries.y - panel.scrollTop
     }
 
     const zoom_level = getZoomLevel();
