@@ -4,7 +4,7 @@ import {LOG, Offsets, PageSize} from "../converter";
 export const IMAGE_BASE64_REGEXP = new RegExp("data:image/.*;base64,");
 
 
-export function convertImages(offsets: Offsets, page_size: PageSize) {
+export function convertImages(offsets: Offsets, page_size: PageSize, zoom_level: number) {
     LOG.info("Converting images");
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -36,16 +36,22 @@ export function convertImages(offsets: Offsets, page_size: PageSize) {
 
         const data = src.replace(IMAGE_BASE64_REGEXP, "");
 
-        const converted_image = new Image(data, x || (image_boundaries.x - offsets.x), y || (image_boundaries.y - offsets.y), image.width, image.height);
+        const real_x = (x || ((image_boundaries.x - offsets.x) / zoom_level));
+        const real_y = (y || ((image_boundaries.y - offsets.y) / zoom_level));
+
+        const converted_image = new Image(
+            data,
+            real_x,
+            real_y,
+            image.width,
+            image.height
+        );
         converted_images.push(converted_image);
 
         // Inelegant solution to export images max_width and max_height by side effect without
         // scanning multiple times all the images
-        if (page_size) {
-            page_size.width = Math.max(page_size.width, converted_image.right);
-            page_size.height = Math.max(page_size.height, image_boundaries.bottom);
-        }
-
+        page_size.width = Math.max(page_size.width, converted_image.right);
+        page_size.height = Math.max(page_size.height, converted_image.bottom);
     }
     return converted_images
 }
