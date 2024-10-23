@@ -50,8 +50,8 @@ export function convertImages(offsets: Offsets, page_size: PageSize, zoom_level:
 
         // Inelegant solution to export images max_width and max_height by side effect without
         // scanning multiple times all the images
-        page_size.width = Math.max(page_size.width, converted_image.right / zoom_level);
-        page_size.height = Math.max(page_size.height, image_boundaries.bottom / zoom_level);
+        page_size.width = Math.max(page_size.width, converted_image.right);
+        page_size.height = Math.max(page_size.height, converted_image.bottom);
     }
     return converted_images
 }

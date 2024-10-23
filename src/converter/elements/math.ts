@@ -91,8 +91,8 @@ export async function convertMathMLBlocks(offsets: Offsets, math_dark_mode: bool
                 img.height,
             )
 
-            page_size.width = Math.max(page_size.width, (boundingRect.x + img.width)  / zoom_level);
-            page_size.height = Math.max(page_size.height, (boundingRect.y + img.height)  / zoom_level);
+            page_size.width = Math.max(page_size.width, tex_image.right);
+            page_size.height = Math.max(page_size.height, tex_image.bottom);
 
             // Pushing the TexImage into the output array
             converted_blocks.push(tex_image);
