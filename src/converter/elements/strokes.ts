@@ -53,8 +53,6 @@ export function convertStrokes(dark_mode: boolean, page_size: PageSize, zoom_lev
                 // Xournal strokes representation doesn't permit empty spaces/skips, so we need to split the SVG Path into
                 // multiple strokes in case of movements
                 if (directive === "M") {
-                    // Inelegant solution to export strokes max_width and max_height by side effect without
-                    // scanning multiple times all the strokes
                     stroke = new Stroke();
                     stroke.width = width;
                     stroke.color = color;
@@ -82,8 +80,11 @@ export function convertStrokes(dark_mode: boolean, page_size: PageSize, zoom_lev
                         const next_x = old_coords[0] + (x * SCALE_X);
                         const next_y = old_coords[1] + (y * SCALE_Y);
 
+                        // Inelegant solution to export strokes max_width and max_height by side effect without
+                        // scanning multiple times all the strokes
                         page_size.width = Math.max(page_size.width, next_x);
                         page_size.height = Math.max(page_size.height, next_y);
+
                         stroke.coords.push([next_x, next_y]);
                         x = parseInt(directives[i]);
                         y = parseInt(directives[i + 1]);
