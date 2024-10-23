@@ -65,14 +65,14 @@ export async function convertMathMLBlocks(offsets: Offsets, math_dark_mode: bool
                 img.src = url;
             });
             // Setting output image resolution scale based on user preferences (x1, x2, x4)
-            canvas.width = img.width * math_quality * zoom_level;
-            canvas.height = img.height * math_quality * zoom_level;
+            canvas.width = img.width * math_quality ;
+            canvas.height = img.height * math_quality ;
 
             // Drawing the image into a Canvas
             if(math_dark_mode) {
                 ctx.filter = 'invert(100%)';
             }
-            ctx.drawImage(img, 0, 0, boundingRect.width * math_quality, boundingRect.height * math_quality);
+            ctx.drawImage(img, 0, 0, boundingRect.width * math_quality / zoom_level, boundingRect.height * math_quality / zoom_level);
 
             // Exporting the Canvas as an encoded Base64 PNG string
             const uri = canvas.toDataURL("image/png", 1);
