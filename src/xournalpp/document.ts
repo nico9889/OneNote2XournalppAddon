@@ -1,5 +1,4 @@
 import {Page} from "./page";
-import {escapeXml} from "./text";
 
 export class Document {
     title: string;
