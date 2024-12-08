@@ -23,17 +23,20 @@ export function wrapText(data: string, fontSize: number, width: number): string 
 }
 
 export class Text {
-    color: RGBAColor;
-    data: string = "";
-    width: number = 0;
-    size: number = 12;
-
-    constructor(data: string = "", public font: string = "Courier New", size: number = 12,
-                public x: number = 0, public y: number = 0, color: RGBAColor | Color = new RGBAColor(0, 0, 0),
-                public ts: number = 0, public fn: string = "", width: number = 0) {
-        if(color instanceof RGBAColor){
+    constructor(
+        readonly data: string = "",
+        readonly font: string = "Courier New",
+        readonly size: number = 12,
+        readonly x: number = 0,
+        readonly y: number = 0,
+        public color: RGBAColor | Color = new RGBAColor(0, 0, 0),
+        readonly ts: number = 0,
+        readonly fn: string = "",
+        readonly width: number = 0
+    ) {
+        if (color instanceof RGBAColor) {
             this.color = color;
-        }else{
+        } else {
             this.color = RGBAColor.fromColor(color);
         }
         this.data = data;
@@ -42,8 +45,7 @@ export class Text {
     }
 
 
-
-    toXml(){
+    toXml() {
         const out = escapeXml(wrapText(this.data, this.size, this.width));
         return `<text font="${this.font}" size="${this.size.toFixed(0)}" x="${this.x.toFixed(4)}" y="${this.y.toFixed(4)}" color="${this.color.toString()}">${out}</text> `
     }
