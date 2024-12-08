@@ -11,10 +11,10 @@ export function escapeXml(data: string) {
 export function wrapText(data: string, fontSize: number, width: number): string {
     let out = "";
     let space = 0;
-    for(let i=0;i<data.length;i++){
-        out+= data[i];
+    for (const chunk of data) {
+        out += chunk;
         space += fontSize;
-        if(space > width * 1.8){
+        if (space > width * 1.8) {
             space = 0;
             out += "\n";
         }
