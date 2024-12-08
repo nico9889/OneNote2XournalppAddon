@@ -24,15 +24,15 @@ export function wrapText(data: string, fontSize: number, width: number): string 
 
 export class Text {
     constructor(
-        readonly data: string = "",
-        readonly font: string = "Courier New",
-        readonly size: number = 12,
-        readonly x: number = 0,
-        readonly y: number = 0,
+        public data: string = "",
+        public font: string = "Courier New",
+        public size: number = 12,
+        public x: number = 0,
+        public y: number = 0,
         public color: RGBAColor | Color = new RGBAColor(0, 0, 0),
-        readonly ts: number = 0,
-        readonly fn: string = "",
-        readonly width: number = 0
+        public ts: number = 0,
+        public fn: string = "",
+        public width: number = 0
     ) {
         if (color instanceof RGBAColor) {
             this.color = color;
