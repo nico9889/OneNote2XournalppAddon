@@ -39,6 +39,10 @@ export class Layer{
     }
 
     toXml(): string {
+        let length = this.strokes.length + this.images.length + this.texts.length + this.maths.length;
+        if(!length){
+            return "";
+        }
         let out = "<layer>";
         for (const stroke of this.strokes) {
             out += `${stroke.toXml()}\n`;
