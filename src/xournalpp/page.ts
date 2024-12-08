@@ -34,16 +34,17 @@ export class Layer{
     images: Image[] = [];
     strokes: Stroke[] = [];
     maths: TexImage[] = [];
+    name: string = ""
 
     constructor() {
     }
 
     toXml(): string {
-        let length = this.strokes.length + this.images.length + this.texts.length + this.maths.length;
+        const length = this.strokes.length + this.images.length + this.texts.length + this.maths.length;
         if(!length){
             return "";
         }
-        let out = "<layer>";
+        let out = `<layer name="${this.name}">`;
         for (const stroke of this.strokes) {
             out += `${stroke.toXml()}\n`;
         }

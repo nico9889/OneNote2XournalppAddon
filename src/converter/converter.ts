@@ -135,27 +135,36 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
     if (separateLayers) {
         // To simplify the editing of the exported document different layers are used for different elements
         LOG.info("Creating images layer");
-        page.layers.push(new Layer());
+        let layer = new Layer();
+        layer.name = "Images";
         LOG.info("Adding images");
-        page.layers.at(-1)!.images = converted_images;
+        layer.images = converted_images;
+        page.layers.push(layer);
 
         LOG.info("Creating maths layer");
-        page.layers.push(new Layer());
+        layer = new Layer();
+        layer.name = "Math"
         LOG.info("Adding maths");
-        page.layers.at(-1)!.maths = converted_math_blocks;
+        layer.maths = converted_math_blocks;
+        page.layers.push(layer);
 
         LOG.info("Creating texts layer");
-        page.layers.push(new Layer());
+        layer = new Layer();
+        layer.name = "Texts";
         LOG.info("Adding texts");
-        page.layers.at(-1)!.texts = converted_texts;
+        layer.texts = converted_texts;
+        page.layers.push(layer);
 
         LOG.info("Creating strokes layer");
-        page.layers.push(new Layer());
+        layer = new Layer();
+        layer.name = "Pen/Highlighter strokes";
         LOG.info("Adding strokes")
-        page.layers.at(-1)!.strokes = converted_strokes;
+        layer.strokes = converted_strokes;
+        page.layers.push(layer);
     } else {
         LOG.info("Creating new common layer");
         const layer = new Layer();
+        layer.name = "All elements";
         LOG.info("Adding elements to the layer");
         layer.images = converted_images;
         layer.maths = converted_math_blocks;
