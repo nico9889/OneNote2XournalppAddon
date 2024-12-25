@@ -14,16 +14,20 @@ function wrapCharToSpan(data: string): HTMLSpanElement[] {
 }
 
 
-function splitWrappedText(elements: HTMLSpanElement[], text: string): [string, string | undefined] {
-    let index = 0;
+function splitWrappedText(elements: HTMLSpanElement[], text: string): string[] {
+    let prev_index = 0;
     let offsetTop = elements[0].offsetTop;
-    while (index < elements.length && offsetTop === elements[index].offsetTop) {
-        index++;
+    let substrings = [];
+
+    for (let index = 0; index < elements.length; index++) {
+        if (offsetTop !== elements[index].offsetTop) {
+            offsetTop = elements[index].offsetTop;
+            substrings.push(text.substring(prev_index, index));
+            prev_index = index;
+        }
     }
-    if (index >= text.length) {
-        return [text, undefined];
-    }
-    return [text.substring(0, index), text.substring(index, text.length)];
+    substrings.push(text.substring(prev_index, elements.length));
+    return substrings;
 }
 
 
