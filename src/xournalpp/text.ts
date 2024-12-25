@@ -12,7 +12,7 @@ export function escapeXml(data: string) {
 export class Text {
     constructor(
         public data: string = "",
-        public font: string = "Courier New",
+        public font: string = "Noto Sans",
         public size: number = 12,
         public x: number = 0,
         public y: number = 0,
@@ -34,6 +34,6 @@ export class Text {
 
     toXml() {
         const out = escapeXml(this.data);
-        return `<text font="${this.font}" size="${this.size.toFixed(0)}" x="${this.x.toFixed(4)}" y="${this.y.toFixed(4)}" color="${this.color.toString()}">${out}</text> `
+        return `<text font="${this.font}" size="${this.size.toFixed(3)}" x="${this.x.toFixed(4)}" y="${this.y.toFixed(4)}" color="${this.color.toString()}">${out}</text> `
     }
 }

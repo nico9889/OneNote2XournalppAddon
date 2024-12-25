@@ -3,28 +3,27 @@ import {Text} from "../../xournalpp/text";
 import {Color, RGBAColor} from "../../xournalpp/utils";
 
 
-export function reduceToFillRect(data: string, fontSize: number, width: number): [string, string] {
-    fontSize /= 1.7;
-    let split = 0;
-    let space = 0;
-    const chunks = data.split(" ");
+function wrapCharToSpan(data: string): HTMLSpanElement[] {
+    const elements = [];
+    for (const c of data) {
+        const element = document.createElement("span") as HTMLSpanElement;
+        element.innerText = c;
+        elements.push(element);
+    }
+    return elements;
+}
+
+
+function splitWrappedText(elements: HTMLSpanElement[], text: string): [string, string | undefined] {
     let index = 0;
-    let fit = true;
-    while (index < chunks.length && fit) {
-        const chunk = chunks[index];
-        // the last sum keeps in consideration that every word is separated by a space, except the last one
-        const length = chunk.length + Number(index != chunks.length - 1);
-        fit = ((space + ((length - 1) * fontSize)) < width);
-        if (fit) {
-            split += length;
-            space += length * fontSize;
-            index += 1;
-        }
+    let offsetTop = elements[0].offsetTop;
+    while (index < elements.length && offsetTop === elements[index].offsetTop) {
+        index++;
     }
-    if (split >= data.length) {
-        return [data, ""];
+    if (index >= text.length) {
+        return [text, undefined];
     }
-    return [data.substring(0, split), data.substring(split, data.length)];
+    return [text.substring(0, index), text.substring(index, text.length)];
 }
 
 
@@ -36,9 +35,20 @@ function processParagraph(paragraph: HTMLParagraphElement,
     for (const text of texts) {
         if (text.children[0]?.innerHTML) {
             let complete_text = "";
+            const original_text = [];
+            const wrapped_text = [];
             for (let child of text.children) {
                 if (child.classList.contains("SpellingError") || child.classList.contains("NormalTextRun")) {
-                    complete_text = complete_text + decodeURIComponent((child as HTMLElement).innerText);
+                    const htmlChild = child as HTMLElement;
+                    original_text.push(htmlChild.innerHTML);
+                    const chunk = decodeURIComponent(htmlChild.innerText);
+                    complete_text = complete_text + chunk;
+                    htmlChild.innerHTML = "";
+                    const wrapped_characters = wrapCharToSpan(chunk);
+                    for (const node of wrapped_characters) {
+                        htmlChild.append(node);
+                        wrapped_text.push(node);
+                    }
                 }
             }
 
@@ -61,29 +71,40 @@ function processParagraph(paragraph: HTMLParagraphElement,
                     color = new RGBAColor(Number(r), Number(g), Number(b));
             }
 
-            const fontSize = (Number(window.getComputedStyle(text).getPropertyValue("font-size").replace("px", "")) ?? 16) * 0.75;
+            const fontSize = ((Number(window.getComputedStyle(text).getPropertyValue("font-size").replace("px", "")) ?? 12));
 
-            let remaining = complete_text;
             const textBoundaries = text.getClientRects();
-            for (const rect of textBoundaries) {
-                const converted_text = new Text();
-                [converted_text.data, remaining] = reduceToFillRect(remaining, fontSize, rect.width);
-                converted_text.size = fontSize;
-                if (color)
-                    converted_text.color = color;
+            const lines = splitWrappedText(wrapped_text, complete_text);
 
-                converted_text.x = (rect.x - offsets.x) / zoom_level;
-                converted_text.y = (rect.y - offsets.y) / zoom_level;
+            for (let index = 0; index < textBoundaries.length; index++) {
+                const rect = textBoundaries[index];
+                const line = lines[index];
+                if (line) {
+                    const converted_text = new Text();
+                    converted_text.size = fontSize;
 
-                // FIXME: zoom_level * 0.8 resulted out from trial&error, it may be wrong...
-                converted_text.width = (rect.width) / (zoom_level * 0.8);
+                    converted_text.data = line;
+                    if (color)
+                        converted_text.color = color;
+                    converted_text.x = (rect.x - offsets.x) / zoom_level;
+                    converted_text.y = (rect.y - offsets.y) / zoom_level;
 
-                converted_texts.push(converted_text);
+                    // FIXME: zoom_level * 0.8 resulted out from trial&error, it may be wrong...
+                    converted_text.width = (rect.width) / (zoom_level * 0.8);
 
-                // Inelegant solution to export texts max_width and max_height by side effect without
-                // scanning multiple times all the texts
-                page_size.width = Math.max(page_size.width, converted_text.x + converted_text.width);
-                page_size.height = Math.max(page_size.height, converted_text.y + (rect.height / zoom_level));
+                    converted_texts.push(converted_text);
+
+                    // Inelegant solution to export texts max_width and max_height by side effect without
+                    // scanning multiple times all the texts
+                    page_size.width = Math.max(page_size.width, converted_text.x + converted_text.width);
+                    page_size.height = Math.max(page_size.height, converted_text.y + (rect.height / zoom_level));
+                }
+            }
+
+            // Restore the original content
+            for (let index = 0; index < text.children.length; index++) {
+                text.children[index].innerHTML = original_text[index];
+                index += 1;
             }
         }
     }
