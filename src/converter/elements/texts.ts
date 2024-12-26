@@ -121,9 +121,17 @@ export function convertTexts(offsets: Offsets, dark_mode: boolean, page_size: Pa
     const converted_texts: Text[][] = [];
 
     const paragraphs = document.getElementsByClassName("Paragraph") as HTMLCollectionOf<HTMLParagraphElement>;
+    
     for (const paragraph of paragraphs) {
-        const exported_texts = processParagraph(paragraph, offsets, dark_mode, page_size, zoom_level);
-        converted_texts.push(exported_texts);
+        const backupParagraph = paragraph.innerHTML;
+        try {
+            const exported_texts = processParagraph(paragraph, offsets, dark_mode, page_size, zoom_level);
+            converted_texts.push(exported_texts);
+        }catch(e){
+            LOG.error(`An error occurred while exporting a text paragraph: ${e}`)
+            paragraph.innerHTML = "";
+            paragraph.innerHTML = backupParagraph;
+        }
     }
 
 
