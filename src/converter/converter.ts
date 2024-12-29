@@ -11,6 +11,7 @@ import {convertTexts} from "./elements/texts";
 import {convertStrokes} from "./elements/strokes";
 import {convertImages} from "./elements/images";
 import {convertMathMLBlocks} from "./elements/math";
+import {progressTracker} from "./progress";
 
 
 export const COLOR_REGEXP = new RegExp("rgb\\(([0-9]{1,3}), ?([0-9]{1,3}), ?([0-9]{1,3})\\)");
@@ -75,8 +76,6 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
     const texts_dark_mode = message.texts_dark_mode;
     const math_dark_mode = message.math_dark_mode;
     const math_quality = message.math_quality;
-
-
     LOG.info("Conversion started");
     LOG.info(`Options:\n\tstrokes: ${strokes}\n\timages: ${images}\n\ttexts: ${texts}\n\tmaths: ${maths}`);
 
@@ -103,6 +102,8 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
             reject();
         });
     }
+    await progressTracker.reset();
+
     const panel_boundaries = panel.getBoundingClientRect();
     const offsets = {
         x: panel_boundaries.x - panel.scrollLeft,
@@ -112,9 +113,13 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
     const zoom_level = getZoomLevel();
 
     const converted_texts: Text[] = (texts) ? convertTexts(offsets, texts_dark_mode, page_size, zoom_level) : [];
+    await progressTracker.bump();
     const converted_images: Image[] = (images) ? convertImages(offsets, page_size, zoom_level) : [];
+    await progressTracker.bump();
     const converted_strokes: Stroke[] = (strokes) ? convertStrokes(strokes_dark_mode, page_size, zoom_level) : [];
+    await progressTracker.bump();
     const converted_math_blocks: TexImage[] = (maths) ? (await convertMathMLBlocks(offsets, math_dark_mode, math_quality, page_size, zoom_level)) : [];
+    await progressTracker.bump();
 
     // Creates a new Xournal++ document
     LOG.info("Creating new XOPP file");
@@ -183,6 +188,7 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
     // Xournal++ file format is a GZIP archive with an XML file inside. We need to GZIP the XML before
     // exporting it
     const data = new Blob([exportDoc.toXml()], {type: "application/xml"});
+    await progressTracker.bump();
 
     // Using browser built-in compression API to generate the GZipped file
     const compressedStream = data.stream().pipeThrough(
@@ -194,6 +200,7 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
     // The GZIP file is associated to a phantom Anchor element to be exported
     LOG.info("Exporting file");
     const blob = await response.blob();
+    await progressTracker.bump();
     const pom = document.createElement("a");
     pom.setAttribute('href', URL.createObjectURL(blob));
     LOG.success("File exported successfully");
@@ -215,3 +222,4 @@ export function downloadDocument(document: DownloadableDocument) {
     document.pom.setAttribute('download', `${sanitizeFileName(document.title)}.xopp`);
     document.pom.click();
 }
+

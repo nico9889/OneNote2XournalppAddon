@@ -1,10 +1,11 @@
 import browser from "webextension-polyfill";
 import {Status, LogLine, COLORS} from "./log/log";
-import {ConvertMessage} from "./messages/convert";
+import {ConvertMessage, ProgressMessage} from "./messages/convert";
+import {Message} from "./messages";
 
 document.querySelectorAll<HTMLElement>('[o2x-i18n]').forEach((el) => {
     const message = browser.i18n.getMessage(el.getAttribute('o2x-i18n')!);
-    if (message){
+    if (message) {
         el.innerText = message;
     }
 });
@@ -13,6 +14,7 @@ document.querySelectorAll<HTMLElement>('[o2x-i18n]').forEach((el) => {
 const appSettings: HTMLDivElement = document.getElementById("appSettings") as HTMLDivElement;
 const restrictedPages: HTMLSpanElement = document.getElementById("restrictedPages") as HTMLSpanElement;
 const exportButton: HTMLButtonElement = document.getElementById("exportButton") as HTMLButtonElement;
+const progressBar: HTMLProgressElement = document.getElementById("exportProgressBar") as HTMLProgressElement;
 const fileNameInput: HTMLInputElement = document.getElementById("fileName") as (HTMLInputElement);
 const exportImages: HTMLInputElement = document.getElementById("exportImages") as (HTMLInputElement);
 const exportTexts: HTMLInputElement = document.getElementById("exportTexts") as (HTMLInputElement);
@@ -68,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tab = (await browser.tabs.query({active: true, currentWindow: true}))[0];
     if (!tab.url?.startsWith('https://onedrive.live.com/')
         && !tab.url?.match("https:\\/\\/[a-zA-Z0-9-]+\\.sharepoint\\.com.*$")) {
-        if(appSettings){
+        if (appSettings) {
             appSettings.outerHTML = "";
         }
         if (container) {
@@ -78,8 +80,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             error.innerText = browser.i18n.getMessage("restrictedPages");
             container.append(error);
         }
-    }else{
-        if(restrictedPages)
+    } else {
+        if (restrictedPages)
             restrictedPages.outerHTML = "";
     }
     writeLine(
@@ -254,7 +256,7 @@ exportButton?.addEventListener('click', async () => {
         await browser.tabs.sendMessage(tab?.id ?? 0, {
             text: JSON.stringify(message)
         });
-    } catch(e) {
+    } catch (e) {
         writeLine({
             status: Status.ERROR,
             date: new Date(),
@@ -271,8 +273,15 @@ function writeLine(line: LogLine) {
     //log?.prepend(row);
 }
 
-/* TODO
-browser.runtime.onMessage.addListener((message) => {
+
+browser.runtime.onMessage.addListener(async (msg) => {
+    const message = JSON.parse(msg.text) as (Message);
+    if (message.message === 'progress') {
+        const progress = (message as ProgressMessage).progress;
+        progressBar.value = Math.round(progress);
+        progressBar.innerText = `${progress}%`;
+    }
+    /* TODO
     if (message.message === 'log_line') {
         const line: LogLine = message.line;
         writeLine(line);
@@ -284,6 +293,5 @@ browser.runtime.onMessage.addListener((message) => {
         for (const line of lines) {
             writeLine(line);
         }
-    }
+    }*/
 });
- */

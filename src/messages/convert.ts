@@ -19,3 +19,13 @@ export interface ConvertMessage extends Message {
     math_dark_mode: boolean
     math_quality: MathQuality
 }
+
+export enum Status{
+    Ok = 0,
+    Error = 1
+}
+
+export interface ProgressMessage extends Message {
+    progress: number,
+    status: Status
+}

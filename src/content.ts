@@ -19,7 +19,6 @@ browser.runtime.onMessage.addListener(async(msg) => {
         const document = await convertNote(message as ConvertMessage);
         downloadDocument(document);
     }
-
     /* TODO
     else if (message.message === 'full_log') {
         log.writeAll();

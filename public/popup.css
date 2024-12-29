@@ -9,11 +9,16 @@ body {
     text-align: center;
     overflow: hidden;
     min-width: 25rem;
-    max-width: 25rem;
+    max-width: 26rem;
 }
 
 a {
     color: currentColor;
+}
+
+.mx-1{
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
 }
 
 .m-3 {
