@@ -8,24 +8,11 @@ export function escapeXml(data: string) {
         .replace(/'/g, '&apos;');
 }
 
-export function wrapText(data: string, fontSize: number, width: number): string {
-    let out = "";
-    let space = 0;
-    for (const chunk of data) {
-        out += chunk;
-        space += fontSize;
-        if (space > width * 1.8) {
-            space = 0;
-            out += "\n";
-        }
-    }
-    return out;
-}
 
 export class Text {
     constructor(
         public data: string = "",
-        public font: string = "Courier New",
+        public font: string = "Noto Sans",
         public size: number = 12,
         public x: number = 0,
         public y: number = 0,
@@ -46,7 +33,7 @@ export class Text {
 
 
     toXml() {
-        const out = escapeXml(wrapText(this.data, this.size, this.width));
-        return `<text font="${this.font}" size="${this.size.toFixed(0)}" x="${this.x.toFixed(4)}" y="${this.y.toFixed(4)}" color="${this.color.toString()}">${out}</text> `
+        const out = escapeXml(this.data);
+        return `<text font="${this.font}" size="${this.size.toFixed(3)}" x="${this.x.toFixed(4)}" y="${this.y.toFixed(4)}" color="${this.color.toString()}">${out}</text> `
     }
 }

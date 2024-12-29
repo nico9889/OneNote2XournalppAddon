@@ -13,7 +13,7 @@ import {convertImages} from "./elements/images";
 import {convertMathMLBlocks} from "./elements/math";
 
 
-export const COLOR_REGEXP = new RegExp("rgb\\(([0-9]{1,3}),([0-9]{1,3}),([0-9]{1,3})\\)");
+export const COLOR_REGEXP = new RegExp("rgb\\(([0-9]{1,3}), ?([0-9]{1,3}), ?([0-9]{1,3})\\)");
 
 // TODO: replace with something better
 export const LOG = new Log();
