@@ -1,10 +1,10 @@
-:root{
+:root {
     --light: rgb(241, 244, 248);
     --dark: rgb(33, 37, 41);
-    --grey:rgb(66, 74, 82);
+    --grey: rgb(66, 74, 82);
 }
 
-body{
+body {
     font-family: sans-serif;
     text-align: center;
     overflow: hidden;
@@ -16,44 +16,44 @@ a {
     color: currentColor;
 }
 
-.m-3{
+.m-3 {
     margin: 1rem;
 }
 
-.me-1{
+.me-1 {
     margin-right: 0.25rem;
 }
 
-.m-auto{
+.m-auto {
     margin: auto;
 }
 
-.mb-auto{
+.mb-auto {
     margin-bottom: auto !important;
 }
 
-.my-0{
+.my-0 {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
 }
 
-.my-1{
+.my-1 {
     margin-top: 0.25rem !important;
     margin-bottom: 0.25rem !important;
 }
 
-.px-1{
+.px-1 {
     padding-right: 0.25rem !important;
     padding-left: 0.25rem !important;
 }
 
-.container{
+.container {
     display: flex;
     flex: 1 0 auto;
     flex-direction: column;
 }
 
-.log{
+.log {
     padding: 0.25rem;
     display: flex;
     flex: 1 0 auto;
@@ -66,130 +66,130 @@ a {
     text-align: start;
 }
 
-hr{
+hr {
     width: 100%;
     margin-top: 0.25rem;
     margin-bottom: 0.25rem;
 }
 
-.title{
+.title {
     margin: 0;
     align-content: center;
     align-items: center;
 }
 
-.btn{
+.btn {
     border: transparent;
     background: transparent;
-    margin: 0.25rem auto;
     flex: 1 0 auto;
     width: max-content;
     padding: 0.5rem;
-    box-shadow: 0 0 0.5rem 0 rgba(0,0,0,0.4);
+    box-shadow: 0 0 0.5rem 0 rgba(0, 0, 0, 0.4);
     font-size: 1rem;
     font-weight: bold;
     align-content: center;
-    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.btn:hover{
+.btn:hover {
     background: blueviolet;
     color: white;
     cursor: pointer;
-    box-shadow: 0 0.25rem 0.5rem 0 rgba(0,0,0,0.4);
+    box-shadow: 0 0.25rem 0.5rem 0 rgba(0, 0, 0, 0.4);
 }
 
-.border-color{
+.border-color {
     border: solid blueviolet;
     border-radius: 0.25rem;
 }
 
-.file-name{
-    padding: 1rem;
+.file-name {
+    padding: 0.25rem;
 }
 
-.additional-options{
+.additional-options {
     text-align: start;
 }
 
-.text-muted{
+.text-muted {
     color: var(--grey);
 }
 
-.row{
+.row {
     display: flex;
     flex: 1 0 auto;
     flex-direction: row;
 }
 
-.col{
+.col {
     display: flex;
+    flex-grow: 1;
     flex-direction: column;
-    margin: auto;
     padding-left: 0.25rem;
     padding-right: 0.25rem;
 }
 
-.form-checkbox{
+.form-checkbox {
     margin: 0.5rem;
 }
 
-label.checkbox-text{
+label.checkbox-text {
     cursor: pointer;
     -webkit-user-select: none;
     user-select: none;
 }
 
-.footer{
+.useful-links {
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
     font-size: 1rem;
     font-weight: bold;
 }
 
-.text-default{
+.text-default {
     color: var(--dark);
 }
 
-.text-danger{
+.text-danger {
     color: #dc3545;
 }
 
-.bg-auto{
+.bg-auto {
     background-color: var(--dark);
     color: var(--light);
 }
 
-.bg-danger{
+.bg-danger {
     background-color: #dc3545;
 }
 
-.bg-success{
+.bg-success {
     background-color: #198754;
 }
 
-.bg-warning{
+.bg-warning {
     background-color: #fd7e14;
 }
 
-.bg-debug{
+.bg-debug {
     background-color: #0d6efd;
 }
 
-.d-none{
+.d-none {
     display: none;
 }
 
 @media (prefers-color-scheme: dark) {
-    :root{
+    :root {
         --grey: rgb(132, 148, 164);
     }
 
-    .text-default{
+    .text-default {
         color: var(--light);
     }
 
-    body{
+    body {
         color: var(--light);
         background: var(--dark);
     }

@@ -121,7 +121,7 @@ export function convertTexts(offsets: Offsets, dark_mode: boolean, page_size: Pa
     const converted_texts: Text[][] = [];
 
     const paragraphs = document.getElementsByClassName("Paragraph") as HTMLCollectionOf<HTMLParagraphElement>;
-    
+
     for (const paragraph of paragraphs) {
         const backupParagraph = paragraph.innerHTML;
         try {

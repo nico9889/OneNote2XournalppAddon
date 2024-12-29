@@ -61,5 +61,11 @@
   },
   "changelogHref": {
     "message": "Cambiamenti"
+  },
+  "exportOptionsLabel": {
+    "message": "Opzioni esportazione"
+  },
+  "pageOptionsLabel": {
+    "message": "Opzioni pagina"
   }
 }
