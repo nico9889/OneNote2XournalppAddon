@@ -31,7 +31,11 @@ export class Log {
 
     }
 
-    write(line: LogLine) {
+    reset() {
+        this.#lines = [];
+    }
+
+    write(_: LogLine) {
         /* TODO
         this.#lines.push(line);
         if(this.#lines.length > 200){

@@ -102,6 +102,7 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
             reject();
         });
     }
+    LOG.reset();
     await progressTracker.reset();
 
     const panel_boundaries = panel.getBoundingClientRect();
