@@ -22,16 +22,24 @@ class ProgressTracker {
         }).then();
     }
 
-    async bump() {
-        this.currentStep += 1;
+    private async updateProgressBar(status: Status) {
         const message: ProgressMessage = {
             message: "progress",
             progress: Math.min(Math.round((this.currentStep / this.steps) * 100), 100),
-            status: Status.Ok
+            status: status
         };
         await browser.runtime.sendMessage(0, {
             text: JSON.stringify(message)
         });
+    }
+
+    async bump() {
+        this.currentStep += 1;
+        await this.updateProgressBar(Status.Ok);
+    }
+
+    async error() {
+        await this.updateProgressBar(Status.Error);
     }
 }
 

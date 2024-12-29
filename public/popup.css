@@ -21,6 +21,10 @@ a {
     margin-right: 0.25rem;
 }
 
+progress{
+    accent-color: green;
+}
+
 .m-3 {
     margin: 1rem;
 }

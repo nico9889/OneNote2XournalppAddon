@@ -1,6 +1,6 @@
 import browser from "webextension-polyfill";
 import {Status, LogLine, COLORS} from "./log/log";
-import {ConvertMessage, ProgressMessage} from "./messages/convert";
+import {ConvertMessage, ProgressMessage, Status as ProgressStatus} from "./messages/convert";
 import {Message} from "./messages";
 
 document.querySelectorAll<HTMLElement>('[o2x-i18n]').forEach((el) => {
@@ -273,10 +273,21 @@ function writeLine(line: LogLine) {
     //log?.prepend(row);
 }
 
+let oldStatus: ProgressStatus = ProgressStatus.Ok;
 
 browser.runtime.onMessage.addListener(async (msg) => {
     const message = JSON.parse(msg.text) as (Message);
     if (message.message === 'progress') {
+        const status = (message as ProgressMessage).status;
+        if (status !== oldStatus) {
+            oldStatus = status;
+            if (status === ProgressStatus.Error) {
+                progressBar.style.accentColor = "red";
+            } else {
+                progressBar.style.accentColor = "green";
+            }
+        }
+
         const progress = (message as ProgressMessage).progress;
         progressBar.value = Math.round(progress);
         progressBar.innerText = `${progress}%`;
