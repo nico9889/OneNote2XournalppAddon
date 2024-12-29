@@ -67,5 +67,8 @@
   },
   "pageOptionsLabel": {
     "message": "Opzioni pagina"
+  },
+  "progressBarLabel": {
+    "message": "Progresso:"
   }
 }
