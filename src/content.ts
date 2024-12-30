@@ -21,6 +21,7 @@ browser.runtime.onMessage.addListener(async (msg) => {
             const document = await convertNote(message as ConvertMessage);
             downloadDocument(document);
         } catch (e) {
+            console.error(e);
             await progressTracker.error();
         }
     }
