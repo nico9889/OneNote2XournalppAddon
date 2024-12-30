@@ -8,6 +8,17 @@ export function escapeXml(data: string) {
         .replace(/'/g, '&apos;');
 }
 
+const fonts = new Map<string, [string, string]>();
+
+// onenote.toLowerCase(): [firefox, chrome]
+fonts.set("calibri", ["Noto Sans", "Arial"]);
+
+export function getXournalFont(font: string, isFirefox: boolean): string {
+    const trimmedName = font.replace(/"/g,"").trim().toLowerCase();
+    const fontClass = fonts.get(trimmedName) ?? ["Noto Sans", "Arial"];
+    return fontClass[Number(!isFirefox)];
+}
+
 
 export class Text {
     constructor(
