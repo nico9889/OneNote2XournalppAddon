@@ -73,7 +73,9 @@ function processParagraph(paragraph: HTMLParagraphElement,
                         converted_text.data = line;
                         if (color)
                             converted_text.color = color;
-                        converted_text.font = font;
+
+                        // The quote replacement is necessary only in Chrome
+                        converted_text.font = font.replace(/"/g,"");
                         converted_text.x = (rect.x - offsets.x) / zoom_level;
                         converted_text.y = (rect.y - offsets.y) / zoom_level;
 
