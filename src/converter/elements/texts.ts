@@ -71,9 +71,6 @@ function processParagraph(paragraph: HTMLParagraphElement,
                         converted_text.x = (rect.x - offsets.x) / zoom_level;
                         converted_text.y = (rect.y - offsets.y) / zoom_level;
 
-                        // FIXME: zoom_level * 0.8 resulted out from trial&error, it may be wrong...
-                        converted_text.width = (rect.width) / (zoom_level);
-
                         converted_texts.push(converted_text);
 
                         // Inelegant solution to export texts max_width and max_height by side effect without

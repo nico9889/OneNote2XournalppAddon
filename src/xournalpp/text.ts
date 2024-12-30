@@ -19,7 +19,6 @@ export class Text {
         public color: RGBAColor | Color = new RGBAColor(0, 0, 0),
         public ts: number = 0,
         public fn: string = "",
-        public width: number = 0
     ) {
         if (color instanceof RGBAColor) {
             this.color = color;
@@ -27,7 +26,6 @@ export class Text {
             this.color = RGBAColor.fromColor(color);
         }
         this.data = data;
-        this.width = width;
         this.size = size;
     }
 
