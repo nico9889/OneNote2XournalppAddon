@@ -12,6 +12,8 @@ const fonts = new Map<string, [string, string]>();
 
 // onenote.toLowerCase(): [firefox, chrome]
 fonts.set("calibri", ["Noto Sans", "Arial"]);
+fonts.set("comic sans ms", ["Comic Sans MS", "Comic Sans MS"]);
+fonts.set("segoe ui light", ["Noto Sans", "Noto Sans Symbols2"]);
 
 export function getXournalFont(font: string, isFirefox: boolean): string {
     const trimmedName = font.replace(/"/g,"").trim().toLowerCase();
