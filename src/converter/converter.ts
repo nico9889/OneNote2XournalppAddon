@@ -99,7 +99,7 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
     if (!panel) {
         LOG.error("Conversion failed: cannot find WACViewPanel");
         return new Promise((_, reject) => {
-            reject();
+            reject("Conversion failed: cannot find WACViewPanel");
         });
     }
     LOG.reset();
