@@ -1,7 +1,6 @@
 import {COLOR_REGEXP, LOG, Offsets, PageSize} from "../converter";
-import {getXournalFont, Text} from "../../xournalpp/text";
+import {Text} from "../../xournalpp/text";
 import {Color, RGBAColor} from "../../xournalpp/utils";
-import browser from "webextension-polyfill";
 
 
 // Original idea: https://www.youtube.com/watch?v=kuGA8a_W4s4
@@ -26,7 +25,7 @@ function splitWrappedText(text: HTMLElement): string[] {
 
 
 function processParagraph(paragraph: HTMLParagraphElement,
-                          offsets: Offsets, dark_mode: boolean, page_size: PageSize, zoom_level: number, isFirefox: boolean): Text[] {
+                          offsets: Offsets, dark_mode: boolean, page_size: PageSize, zoom_level: number): Text[] {
     const texts = paragraph.getElementsByClassName("TextRun") as HTMLCollectionOf<HTMLSpanElement>;
     const converted_texts: Text[] = [];
 
@@ -52,7 +51,9 @@ function processParagraph(paragraph: HTMLParagraphElement,
             }
 
             const fontFamily = getComputedStyle(text).getPropertyValue("font-family");
-            const font = getXournalFont(fontFamily.split(",")[1] ?? "Calibri", isFirefox);
+
+            // TODO: add the possibility to override export font
+            const font = fontFamily.split(",")[1] ?? "Calibri";
 
             const fontSize = ((Number(window.getComputedStyle(text).getPropertyValue("font-size").replace("px", "")) ?? 12));
 
@@ -96,13 +97,12 @@ function processParagraph(paragraph: HTMLParagraphElement,
 export function convertTexts(offsets: Offsets, dark_mode: boolean, page_size: PageSize, zoom_level: number): Text[] {
     LOG.info("Converting texts");
     const converted_texts: Text[][] = [];
-    let isFirefox = !window.chrome;
 
     const paragraphs = document.getElementsByClassName("Paragraph") as HTMLCollectionOf<HTMLParagraphElement>;
 
     for (const paragraph of paragraphs) {
         try {
-            const exported_texts = processParagraph(paragraph, offsets, dark_mode, page_size, zoom_level, isFirefox);
+            const exported_texts = processParagraph(paragraph, offsets, dark_mode, page_size, zoom_level);
             converted_texts.push(exported_texts);
         } catch (e) {
             LOG.error(`An error occurred while exporting a text paragraph: ${e}`)

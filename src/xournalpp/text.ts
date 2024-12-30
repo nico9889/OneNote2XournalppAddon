@@ -10,18 +10,6 @@ export function escapeXml(data: string) {
 
 const fonts = new Map<string, [string, string]>();
 
-// onenote.toLowerCase(): [firefox, chrome]
-fonts.set("calibri", ["Noto Sans", "Arial"]);
-fonts.set("comic sans ms", ["Comic Sans MS", "Comic Sans MS"]);
-fonts.set("segoe ui light", ["Noto Sans", "Noto Sans Symbols2"]);
-
-export function getXournalFont(font: string, isFirefox: boolean): string {
-    const trimmedName = font.replace(/"/g,"").trim().toLowerCase();
-    const fontClass = fonts.get(trimmedName) ?? ["Noto Sans", "Arial"];
-    return fontClass[Number(!isFirefox)];
-}
-
-
 export class Text {
     constructor(
         public data: string = "",
