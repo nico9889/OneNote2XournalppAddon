@@ -68,14 +68,16 @@ function processParagraph(paragraph: HTMLParagraphElement,
                         converted_text.data = line;
                         if (color)
                             converted_text.color = color;
+
                         converted_text.x = (rect.x - offsets.x) / zoom_level;
                         converted_text.y = (rect.y - offsets.y) / zoom_level;
 
                         converted_texts.push(converted_text);
 
+                        const text_width = rect.width / zoom_level;
                         // Inelegant solution to export texts max_width and max_height by side effect without
                         // scanning multiple times all the texts
-                        page_size.width = Math.max(page_size.width, converted_text.x + converted_text.width);
+                        page_size.width = Math.max(page_size.width, converted_text.x + text_width);
                         page_size.height = Math.max(page_size.height, converted_text.y + (rect.height / zoom_level));
                     }
 
