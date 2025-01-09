@@ -3,10 +3,6 @@ import {Color, RGBAColor} from "../../xournalpp/utils";
 import {COLOR_REGEXP, LOG, PageSize} from "../converter";
 import {Layer} from "../../xournalpp/page";
 
-const SCALE_X = 0.04;
-const SCALE_Y = 0.04;
-const STROKE_SCALE = 0.04;
-
 export function convertStrokes(layer: Layer, dark_mode: boolean, page_size: PageSize, zoom_level: number): Stroke[] {
     LOG.info("Converting strokes");
     const converted_strokes: Stroke[] = [];
@@ -24,6 +20,12 @@ export function convertStrokes(layer: Layer, dark_mode: boolean, page_size: Page
             width: (view_box_values) ? Number(view_box_values[2]) || 0 : 0,
             height: (view_box_values) ? Number(view_box_values[3]) || 0 : 0,
         }
+
+        const scale_x = Number(stroke.style.width.replace("px", "")) / view_box.width;
+        const scale_y = Number(stroke.style.height.replace("px", "")) / view_box.height;
+        // FIXME: this isn't 100% accurate probably
+        const stroke_scale = (scale_x + scale_y) / 2;
+
 
         // Every stroke for some reason is shifted three times: one external, by SVG style and viewbox property,
         // and one internal, by a large movement in the path ("M n n") in the opposite direction
@@ -47,7 +49,7 @@ export function convertStrokes(layer: Layer, dark_mode: boolean, page_size: Page
             const color = (colors) ? new RGBAColor(Number(colors[1]), Number(colors[2]), Number(colors[3]), Math.round(opacity * 255)) : base_color;
 
             // OneNote stroke width, rounded to 2 decimal positions, defaults to 1 if not found
-            const width = Math.round(Number(path.getAttribute("stroke-width")) * STROKE_SCALE * 100) / 100;
+            const width = Math.round(Number(path.getAttribute("stroke-width")) * stroke_scale * 100) / 100;
 
             for (let i = 0; i < directives.length; i++) {
                 const directive = directives[i];
@@ -66,7 +68,7 @@ export function convertStrokes(layer: Layer, dark_mode: boolean, page_size: Page
                     converted_strokes.push(xStroke);
                     const x = Number(directives[i + 1]);
                     const y = Number(directives[i + 2]);
-                    xStroke.addPoint((x - view_box.x) * SCALE_X + offset_x, (y - view_box.y) * SCALE_Y + offset_y);
+                    xStroke.addPoint((x - view_box.x) * scale_x + offset_x, (y - view_box.y) * scale_y + offset_y);
                     i += 2;
                 } else if (directive == "l") {
                     let x = parseInt(directives[i + 1]);
@@ -77,8 +79,8 @@ export function convertStrokes(layer: Layer, dark_mode: boolean, page_size: Page
                     // index position and continue with normal scan looking for other directives
                     while (!isNaN(x) && !isNaN(y)) {
                         const old_coords = xStroke.lastPoint;
-                        const next_x = old_coords[0] + (x * SCALE_X);
-                        const next_y = old_coords[1] + (y * SCALE_Y);
+                        const next_x = old_coords[0] + (x * scale_x);
+                        const next_y = old_coords[1] + (y * scale_y);
 
                         // Inelegant solution to export strokes max_width and max_height by side effect without
                         // scanning multiple times all the strokes
