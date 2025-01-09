@@ -5,19 +5,9 @@ import {Image} from "./image";
 // The original equation is saved inside the `text` tag for later edit.
 // Somehow the Xournal++ renderer seems to be able to distinguish PDF binary from PNG binary,
 // and it's able to render correctly the TexImage block even if it's content it's replaced with PNG.
-export class TexImage extends Image{
-    // Equation in Tex format
-    text: string;
-
-    constructor(text: string, data: string, x: number, y: number, width: number, height: number) {
-        super(data, x, y, width, height);
-        this.text = text;
-    }
-
-    toXml(){
-        if(!this.data){
-            return "";
-        }
-        return `<teximage text="${this.text}" left="${this.left.toFixed(4)}" right="${this.right.toFixed(4)}" top="${this.top.toFixed(4)}" bottom="${this.bottom.toFixed(4)}">${this.data}</teximage>`
+export class TexImage extends Image {
+    constructor(document: XMLDocument, text: string, data: string, x: number, y: number, width: number, height: number) {
+        super(document, data, x, y, width, height, "teximage");
+        this.element.setAttribute("text", text);
     }
 }

@@ -2,7 +2,7 @@ import {Text} from "../xournalpp/text";
 import {Image} from "../xournalpp/image";
 import {Stroke} from "../xournalpp/stroke";
 import {Background, BackgroundType, Layer, Page} from "../xournalpp/page";
-import {Document} from "../xournalpp/document";
+import {Document as XoppDocument} from "../xournalpp/document";
 import {Color} from "../xournalpp/utils";
 import {Log} from "../log/log";
 import {TexImage} from "../xournalpp/teximage";
@@ -113,82 +113,58 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
 
     const zoom_level = getZoomLevel();
 
-    const converted_texts: Text[] = (texts) ? convertTexts(offsets, texts_dark_mode, page_size, zoom_level) : [];
-    await progressTracker.bump();
-    const converted_images: Image[] = (images) ? convertImages(offsets, page_size, zoom_level) : [];
-    await progressTracker.bump();
-    const converted_strokes: Stroke[] = (strokes) ? convertStrokes(strokes_dark_mode, page_size, zoom_level) : [];
-    await progressTracker.bump();
-    const converted_math_blocks: TexImage[] = (maths) ? (await convertMathMLBlocks(offsets, math_dark_mode, math_quality, page_size, zoom_level)) : [];
-    await progressTracker.bump();
-
     // Creates a new Xournal++ document
     LOG.info("Creating new XOPP file");
-    const exportDoc = new Document(title);
-
+    const exportDoc = new XoppDocument(title);
 
     // Creates a new Xournal++ page
     LOG.info("Creating new page");
     const page_color = (dark_page) ? Color.Black : Color.White;
+    const page = exportDoc.addPage(BackgroundType.Solid, page_color);
+    let layer = page.addLayer();
+    if (separateLayers) {
+        layer.name = "Texts"
+    } else {
+        layer.name = "All elements";
+    }
+    convertTexts(layer, offsets, texts_dark_mode, page_size, zoom_level);
+    await progressTracker.bump();
 
-    // Creates a new Xournal++ page
-    const page = new Page(new Background(BackgroundType.Solid, page_color));
+    if (separateLayers) {
+        layer = page.addLayer();
+        layer.name = "Images";
+    }
+    convertImages(layer, offsets, page_size, zoom_level);
+    await progressTracker.bump();
+
+    if (separateLayers) {
+        layer = page.addLayer();
+        layer.name = "Strokes";
+    }
+    convertStrokes(layer, strokes_dark_mode, page_size, zoom_level);
+    await progressTracker.bump();
+
+    if (separateLayers) {
+        layer = page.addLayer();
+        layer.name = "Math";
+    }
+    await convertMathMLBlocks(layer, offsets, math_dark_mode, math_quality, page_size, zoom_level);
+    await progressTracker.bump();
+
+    // Trimming empty layers
+    page.trim();
 
     // Sets the page size to the farthest point of the farthest object, plus some offset for margin
     page.width = page_size.width + 5;
     page.height = page_size.height + 5;
 
-    if (separateLayers) {
-        // To simplify the editing of the exported document different layers are used for different elements
-        LOG.info("Creating images layer");
-        let layer = new Layer();
-        layer.name = "Images";
-        LOG.info("Adding images");
-        layer.images = converted_images;
-        page.layers.push(layer);
-
-        LOG.info("Creating maths layer");
-        layer = new Layer();
-        layer.name = "Math"
-        LOG.info("Adding maths");
-        layer.maths = converted_math_blocks;
-        page.layers.push(layer);
-
-        LOG.info("Creating texts layer");
-        layer = new Layer();
-        layer.name = "Texts";
-        LOG.info("Adding texts");
-        layer.texts = converted_texts;
-        page.layers.push(layer);
-
-        LOG.info("Creating strokes layer");
-        layer = new Layer();
-        layer.name = "Pen/Highlighter strokes";
-        LOG.info("Adding strokes")
-        layer.strokes = converted_strokes;
-        page.layers.push(layer);
-    } else {
-        LOG.info("Creating new common layer");
-        const layer = new Layer();
-        layer.name = "All elements";
-        LOG.info("Adding elements to the layer");
-        layer.images = converted_images;
-        layer.maths = converted_math_blocks;
-        layer.texts = converted_texts;
-        layer.strokes = converted_strokes;
-
-        LOG.info("Adding layer to the page");
-        page.layers.push(layer);
-    }
-
-    LOG.info("Adding page to the document");
-    exportDoc.pages.push(page);
-
     LOG.info("Generating output file (GZipping)");
+    const serializer = new XMLSerializer();
+    const serializedDocument = serializer.serializeToString(exportDoc.document);
 
     // Xournal++ file format is a GZIP archive with an XML file inside. We need to GZIP the XML before
     // exporting it
-    const data = new Blob([exportDoc.toXml()], {type: "application/xml"});
+    const data = new Blob([serializedDocument], {type: "application/xml"});
     await progressTracker.bump();
 
     // Using browser built-in compression API to generate the GZipped file

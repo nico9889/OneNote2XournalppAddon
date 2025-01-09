@@ -1,10 +1,11 @@
 import {Image} from "../../xournalpp/image";
 import {LOG, Offsets, PageSize} from "../converter";
+import {Layer} from "../../xournalpp/page";
 
 export const IMAGE_BASE64_REGEXP = new RegExp("data:image/.*;base64,");
 
 
-export function convertImages(offsets: Offsets, page_size: PageSize, zoom_level: number) {
+export function convertImages(layer: Layer, offsets: Offsets, page_size: PageSize, zoom_level: number) {
     LOG.info("Converting images");
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -39,7 +40,7 @@ export function convertImages(offsets: Offsets, page_size: PageSize, zoom_level:
         const real_x = (x || ((image_boundaries.x - offsets.x) / zoom_level));
         const real_y = (y || ((image_boundaries.y - offsets.y) / zoom_level));
 
-        const converted_image = new Image(
+        const converted_image = layer.addImage(
             data,
             real_x,
             real_y,

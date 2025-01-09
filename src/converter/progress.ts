@@ -30,6 +30,9 @@ class ProgressTracker {
     }
 
     async error() {
+        if(this.currentStep === 0){
+            this.currentStep = this.steps;
+        }
         await this.updateProgressBar(Status.Error);
     }
 }
