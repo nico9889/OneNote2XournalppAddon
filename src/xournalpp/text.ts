@@ -1,13 +1,5 @@
 import {Color, RGBAColor, Element} from "./utils";
 
-export function escapeXml(data: string) {
-    return data.replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&apos;');
-}
-
 export class Text extends Element {
     constructor(
         document: XMLDocument,
