@@ -8,8 +8,6 @@ export function escapeXml(data: string) {
         .replace(/'/g, '&apos;');
 }
 
-const fonts = new Map<string, [string, string]>();
-
 export class Text extends Element {
     constructor(
         document: XMLDocument,
