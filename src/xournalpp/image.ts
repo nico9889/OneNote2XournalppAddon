@@ -1,22 +1,17 @@
-export class Image {
-    data: string = "";
-    left: number = 0;
-    right: number = 0;
-    bottom: number = 0;
-    top: number = 0;
+import {Element} from "./utils";
 
-    constructor(data: string, x: number, y: number, width: number, height: number) {
-        this.data = data;
-        this.left = x;
-        this.top = y;
-        this.right = (x + width);
-        this.bottom = (y + height);
-    }
+export class Image extends Element {
+    public right: number;
+    public bottom: number;
 
-    toXml() {
-        if (!this.data) {
-            return ""
-        }
-        return `<image left="${this.left.toFixed(4)}" right="${this.right.toFixed(4)}" top="${this.top.toFixed(4)}" bottom="${this.bottom.toFixed(4)}">${this.data}</image>`;
+    constructor(document: XMLDocument, data: string, x: number, y: number, width: number, height: number, element_name: "image" | "teximage" = "image") {
+        super(document, element_name);
+        this.right = x + width;
+        this.bottom = y + height;
+        this.element.setAttribute("left", x.toFixed(4));
+        this.element.setAttribute("right", this.right.toFixed(4));
+        this.element.setAttribute("top", y.toFixed(4));
+        this.element.setAttribute("bottom", this.bottom.toFixed(4));
+        this.element.textContent = data;
     }
 }

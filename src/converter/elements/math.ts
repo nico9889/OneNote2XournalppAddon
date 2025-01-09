@@ -8,6 +8,7 @@ import {MathML} from 'mathjax-full/mjs/input/mathml.js'
 import {SVG} from 'mathjax-full/mjs/output/svg.js'
 import {browserAdaptor} from 'mathjax-full/mjs/adaptors/browserAdaptor.js'
 import {RegisterHTMLHandler} from 'mathjax-full/mjs/handlers/html.js'
+import {Layer} from "../../xournalpp/page";
 
 const UNSAFE_XML_SPACE = new RegExp("&nbsp;", "g");
 
@@ -20,7 +21,7 @@ function sanitize_latex(latex: string): string{
 const ADAPTOR = browserAdaptor();
 RegisterHTMLHandler(ADAPTOR);
 
-export async function convertMathMLBlocks(offsets: Offsets, math_dark_mode: boolean, math_quality: MathQuality, page_size: PageSize, zoom_level: number) {
+export async function convertMathMLBlocks(layer: Layer, offsets: Offsets, math_dark_mode: boolean, math_quality: MathQuality, page_size: PageSize, zoom_level: number) {
     LOG.info("Converting MathML blocks");
     const converted_blocks: TexImage[] = [] // Empty output array
 
@@ -82,7 +83,7 @@ export async function convertMathMLBlocks(offsets: Offsets, math_dark_mode: bool
 
             // Creating a new TexImage with dimensions and data, this object handles
             // the XML conversion
-            const tex_image = new TexImage(
+            const tex_image = layer.addMath(
                 latex,
                 uri.replace(IMAGE_BASE64_REGEXP, ""),
                 (boundingRect.x - offsets.x) / zoom_level,

@@ -4,7 +4,7 @@ import {ProgressMessage, Status} from "../messages/convert";
 class ProgressTracker {
     private currentStep = 0;
 
-    constructor(private steps: number = 1) {
+    constructor(private readonly steps: number = 1) {
         if (this.steps <= 0) {
             this.steps = 1;
         }
@@ -30,6 +30,9 @@ class ProgressTracker {
     }
 
     async error() {
+        if(this.currentStep === 0){
+            this.currentStep = this.steps;
+        }
         await this.updateProgressBar(Status.Error);
     }
 }

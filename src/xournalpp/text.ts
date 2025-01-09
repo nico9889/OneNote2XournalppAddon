@@ -1,38 +1,54 @@
-import {Color, RGBAColor} from "./utils";
+import {Color, RGBAColor, Element} from "./utils";
 
-export function escapeXml(data: string) {
-    return data.replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&apos;');
-}
-
-const fonts = new Map<string, [string, string]>();
-
-export class Text {
+export class Text extends Element {
     constructor(
-        public data: string = "",
-        public font: string = "Noto Sans",
-        public size: number = 12,
-        public x: number = 0,
-        public y: number = 0,
-        public color: RGBAColor | Color = new RGBAColor(0, 0, 0),
-        public ts: number = 0,
-        public fn: string = "",
+        document: XMLDocument,
+        data: string = "",
+        font: string = "Noto Sans",
+        size: number = 12,
+        x: number = 0,
+        y: number = 0,
+        color: RGBAColor | Color = new RGBAColor(0, 0, 0),
+        ts: number = 0,
+        fn: string = "",
     ) {
-        if (color instanceof RGBAColor) {
-            this.color = color;
-        } else {
-            this.color = RGBAColor.fromColor(color);
+        super(document, "text");
+        if (!(color instanceof RGBAColor)) {
+            color = RGBAColor.fromColor(color);
         }
-        this.data = data;
-        this.size = size;
+        this.element.setAttribute("font", font);
+        this.element.setAttribute("size", size.toFixed(3));
+        this.element.setAttribute("x", x.toFixed(4));
+        this.element.setAttribute("y", y.toFixed(4));
+        this.element.setAttribute("color", color.toString());
+
+        this.element.innerText = data;
     }
 
+    set size(size: number) {
+        this.element.setAttribute("size", size.toFixed(3));
+    }
 
-    toXml() {
-        const out = escapeXml(this.data);
-        return `<text font="${this.font}" size="${this.size.toFixed(3)}" x="${this.x.toFixed(4)}" y="${this.y.toFixed(4)}" color="${this.color.toString()}">${out}</text> `
+    set font(font: string) {
+        this.element.setAttribute("font", font);
+    }
+
+    set x(x: number) {
+        this.element.setAttribute("x", x.toFixed(4));
+    }
+
+    set y(y: number) {
+        this.element.setAttribute("y", y.toFixed(4));
+    }
+
+    set color(color: Color | RGBAColor) {
+        if (!(color instanceof RGBAColor)) {
+            color = RGBAColor.fromColor(color);
+        }
+        this.element.setAttribute("color", color.toString());
+    }
+
+    set data(data: string) {
+        this.element.textContent = data;
     }
 }

@@ -48,3 +48,14 @@ export class RGBAColor {
         return `#${this.r.toString(16).padStart(2, "0")}${this.g.toString(16).padStart(2, "0")}${this.b.toString(16).padStart(2, "0")}${this.a.toString(16).padStart(2, "0")}`
     }
 }
+
+
+export class Element{
+    protected document: XMLDocument;
+    readonly element : HTMLElement;
+
+    constructor(document: XMLDocument, name: string) {
+        this.document = document;
+        this.element = document.createElement(name);
+    }
+}

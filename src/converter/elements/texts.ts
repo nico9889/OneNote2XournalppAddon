@@ -1,6 +1,6 @@
 import {COLOR_REGEXP, LOG, Offsets, PageSize} from "../converter";
-import {Text} from "../../xournalpp/text";
 import {Color, RGBAColor} from "../../xournalpp/utils";
+import {Layer} from "../../xournalpp/page";
 
 
 // Original idea: https://www.youtube.com/watch?v=kuGA8a_W4s4
@@ -24,10 +24,9 @@ function splitWrappedText(text: HTMLElement): string[] {
 }
 
 
-function processParagraph(paragraph: HTMLParagraphElement,
-                          offsets: Offsets, dark_mode: boolean, page_size: PageSize, zoom_level: number): Text[] {
+function processParagraph(layer: Layer, paragraph: HTMLParagraphElement,
+                          offsets: Offsets, dark_mode: boolean, page_size: PageSize, zoom_level: number) {
     const texts = paragraph.getElementsByClassName("TextRun") as HTMLCollectionOf<HTMLSpanElement>;
-    const converted_texts: Text[] = [];
 
     for (const text of texts) {
         if (text.children[0]?.innerHTML) {
@@ -68,48 +67,43 @@ function processParagraph(paragraph: HTMLParagraphElement,
                         const line = lines[index];
                         const rect = textBoundaries[index];
 
-                        const converted_text = new Text();
+                        const converted_text = layer.addText();
                         converted_text.size = fontSize;
                         converted_text.data = line;
                         if (color)
                             converted_text.color = color;
 
                         // The quote replacement is necessary only in Chrome
-                        converted_text.font = font.replace(/"/g,"");
-                        converted_text.x = (rect.x - offsets.x) / zoom_level;
-                        converted_text.y = (rect.y - offsets.y) / zoom_level;
-
-                        converted_texts.push(converted_text);
+                        converted_text.font = font.replace(/"/g, "");
+                        const x = (rect.x - offsets.x) / zoom_level;
+                        const y = (rect.y - offsets.y) / zoom_level;
+                        converted_text.x = x;
+                        converted_text.y = y;
 
                         const text_width = rect.width / zoom_level;
                         // Inelegant solution to export texts max_width and max_height by side effect without
                         // scanning multiple times all the texts
-                        page_size.width = Math.max(page_size.width, converted_text.x + text_width);
-                        page_size.height = Math.max(page_size.height, converted_text.y + (rect.height / zoom_level));
+                        page_size.width = Math.max(page_size.width, x + text_width);
+                        page_size.height = Math.max(page_size.height, y + (rect.height / zoom_level));
                     }
 
                 }
             }
         }
     }
-    return converted_texts;
 }
 
 
-export function convertTexts(offsets: Offsets, dark_mode: boolean, page_size: PageSize, zoom_level: number): Text[] {
+export function convertTexts(layer: Layer, offsets: Offsets, dark_mode: boolean, page_size: PageSize, zoom_level: number) {
     LOG.info("Converting texts");
-    const converted_texts: Text[][] = [];
 
     const paragraphs = document.getElementsByClassName("Paragraph") as HTMLCollectionOf<HTMLParagraphElement>;
 
     for (const paragraph of paragraphs) {
         try {
-            const exported_texts = processParagraph(paragraph, offsets, dark_mode, page_size, zoom_level);
-            converted_texts.push(exported_texts);
+            processParagraph(layer, paragraph, offsets, dark_mode, page_size, zoom_level);
         } catch (e) {
             LOG.error(`An error occurred while exporting a text paragraph: ${e}`)
         }
     }
-
-    return converted_texts.flat(1);
 }
