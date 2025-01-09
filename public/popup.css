@@ -46,6 +46,10 @@ progress{
     margin-bottom: 0 !important;
 }
 
+.mb-1{
+    margin-bottom: 0.25rem !important;
+}
+
 .my-1 {
     margin-top: 0.25rem !important;
     margin-bottom: 0.25rem !important;
