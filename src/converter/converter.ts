@@ -1,11 +1,7 @@
-import {Text} from "../xournalpp/text";
-import {Image} from "../xournalpp/image";
-import {Stroke} from "../xournalpp/stroke";
-import {Background, BackgroundType, Layer, Page} from "../xournalpp/page";
+import {BackgroundType} from "../xournalpp/page";
 import {Document as XoppDocument} from "../xournalpp/document";
 import {Color} from "../xournalpp/utils";
 import {Log} from "../log/log";
-import {TexImage} from "../xournalpp/teximage";
 import {ConvertMessage} from "../messages/convert";
 import {convertTexts} from "./elements/texts";
 import {convertStrokes} from "./elements/strokes";

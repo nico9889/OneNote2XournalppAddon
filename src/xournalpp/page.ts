@@ -3,7 +3,6 @@ import {Text} from "./text";
 import {Stroke} from "./stroke";
 import {Element, Color, RGBAColor} from "./utils";
 import {TexImage} from "./teximage";
-import ch = CSS.ch;
 
 export enum BackgroundType {
     Solid = "solid"

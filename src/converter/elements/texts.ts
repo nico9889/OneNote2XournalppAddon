@@ -1,5 +1,4 @@
 import {COLOR_REGEXP, LOG, Offsets, PageSize} from "../converter";
-import {Text} from "../../xournalpp/text";
 import {Color, RGBAColor} from "../../xournalpp/utils";
 import {Layer} from "../../xournalpp/page";
 
