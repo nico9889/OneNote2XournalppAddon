@@ -3,7 +3,7 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F52OY0N)
 
 [![Get on Addons Mozilla Online](https://extensionworkshop.com/assets/img/documentation/publish/get-the-addon-178x60px.dad84b42.png)](https://addons.mozilla.org/it/firefox/addon/onenote-to-xournal/)
-![Get on Chrome Web Store](https://github.com/user-attachments/assets/e52c6e4c-10c5-4723-8a6a-014c042e02ea)
+[![Get on Chrome Web Store](https://github.com/user-attachments/assets/e52c6e4c-10c5-4723-8a6a-014c042e02ea)](https://chromewebstore.google.com/detail/onenote-to-xournal++/lbghdcdjdfngepdkmmemagflaekkmjmf)
 
 [![Translation status](https://hosted.weblate.org/widget/onenote2xournalpp/addon/287x66-grey.png)](https://hosted.weblate.org/engage/onenote2xournalpp/)
 
