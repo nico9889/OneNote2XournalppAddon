@@ -17,7 +17,13 @@ root.querySelectorAll('[o2x-i18n]').forEach(el => {
 
 // Populate translations file with missing keys to help translators
 function populate_translations(lang_code){
-    const file = fs.readFileSync(`./_locales/${lang_code}/messages.json`, {encoding: "utf8"});
+    let file;
+    try{
+        file = fs.readFileSync(`./_locales/${lang_code}/messages.json`, {encoding: "utf8"});
+    }catch (e){
+        file = {};
+    }
+
 
     const missing_keys = [];
 
