@@ -71,5 +71,7 @@ npm run pack
 ```
 This command creates a "web-ext-artifacts" directory with the contents of "dist" zipped, ready to be installed on Firefox.
 
-# Translation (WIP)
-Translation of this project is being moved to Weblate Hosted.
+# Translations
+This project has been approved for Hosted Weblate Libre Plan.
+
+You can find information on translations in the dedicated Wiki page: https://github.com/nico9889/OneNote2XournalppAddon/wiki/Internationalization#weblate
