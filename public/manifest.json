@@ -1,18 +1,17 @@
 {
   "manifest_version": 3,
-  "name": "OneNote to Xournal++",
+  "name": "NotExp",
   "description": "This addon converts OneNote notes to Xournal++ notes.",
   "default_locale": "en",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "author": "nico9889",
-  "homepage_url": "https://github.com/nico9889/OneNote2XournalppAddon",
+  "homepage_url": "https://github.com/nico9889/NotExp",
   "permissions": [
     "storage"
   ],
   "host_permissions": [
     "https://onedrive.live.com/*",
     "https://*.sharepoint.com/*"
-
   ],
   "content_scripts": [
     {
@@ -27,14 +26,14 @@
     }
   ],
   "icons": {
-    "255": "xournal.png"
+    "255": "NotExp.png"
   },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "255": "xournal.png"
+      "255": "NotExp.png"
     },
-    "default_title": "Convert to Xournal++"
+    "default_title": "NotExp - Export your notes"
   },
   "browser_specific_settings": {
     "gecko": {

@@ -11,8 +11,8 @@ const root = parse(html);
 const default_translation = new Map();
 
 // Query all the translatable texts
-root.querySelectorAll('[o2x-i18n]').forEach(el => {
-    default_translation.set(el.getAttribute('o2x-i18n'), el.innerText);
+root.querySelectorAll('[nex-i18n]').forEach(el => {
+    default_translation.set(el.getAttribute('nex-i18n'), el.innerText);
 });
 
 // Populate translations file with missing keys to help translators
@@ -83,7 +83,7 @@ fs.rmSync('./dist', {recursive: true, force: true});
 await esbuild.build({
     entryPoints: [
         "./src/content.ts",
-        "./src/onenote2xournalpp.ts",
+        "./src/notexp.ts",
     ],
     format: 'cjs',
     platform: "browser",

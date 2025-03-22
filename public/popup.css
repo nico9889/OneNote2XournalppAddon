@@ -2,6 +2,7 @@
     --light: rgb(241, 244, 248);
     --dark: rgb(33, 37, 41);
     --grey: rgb(66, 74, 82);
+    --dark-yellow: rgb(255, 120,0);
 }
 
 body {
@@ -106,14 +107,14 @@ hr {
 }
 
 .btn:hover {
-    background: blueviolet;
+    background: var(--dark-yellow);
     color: white;
     cursor: pointer;
     box-shadow: 0 0.25rem 0.5rem 0 rgba(0, 0, 0, 0.4);
 }
 
 .border-color {
-    border: solid blueviolet;
+    border: solid var(--dark-yellow);
     border-radius: 0.25rem;
 }
 

@@ -99,7 +99,7 @@ export async function convertMathMLBlocks(layer: Layer, offsets: Offsets, math_d
             converted_blocks.push(tex_image);
             URL.revokeObjectURL(url);
         } catch (e) {
-            console.error("O2X: Error converting to SVG", e);
+            console.error("NEX: Error converting to SVG", e);
         }
 
 

@@ -1,4 +1,4 @@
-# OneNote2XournalppAddon
+# NotExp
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F52OY0N)
 
@@ -48,7 +48,7 @@ To work on the code, you need NPM, then with a terminal
 
 * Clone the repository
 ```bash
-git clone https://github.com/nico9889/OneNote2Xournalpp.git
+git clone https://github.com/nico9889/NotExp.git
 ```
 
 * Install the dependencies
@@ -74,4 +74,4 @@ This command creates a "web-ext-artifacts" directory with the contents of "dist"
 # Translations
 This project has been approved for Hosted Weblate Libre Plan.
 
-You can find information on translations in the dedicated Wiki page: https://github.com/nico9889/OneNote2XournalppAddon/wiki/Internationalization#weblate
+You can find information on translations in the dedicated Wiki page: https://github.com/nico9889/NotExp/wiki/Internationalization#weblate

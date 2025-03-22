@@ -85,7 +85,7 @@ export async function convertNote(message: ConvertMessage): Promise<Downloadable
         try {
             title = getTitle();
         } catch (e) {
-            console.error(`O2X: ${e}`);
+            console.error(`NEX: ${e}`);
         }
         if (!title) title = document.title;
     }

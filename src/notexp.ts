@@ -3,8 +3,8 @@ import {Status, LogLine, COLORS} from "./log/log";
 import {ConvertMessage, ProgressMessage, Status as ProgressStatus} from "./messages/convert";
 import {Message} from "./messages";
 
-document.querySelectorAll<HTMLElement>('[o2x-i18n]').forEach((el) => {
-    const message = browser.i18n.getMessage(el.getAttribute('o2x-i18n')!);
+document.querySelectorAll<HTMLElement>('[nex-i18n]').forEach((el) => {
+    const message = browser.i18n.getMessage(el.getAttribute('nex-i18n')!);
     if (message) {
         el.innerText = message;
     }

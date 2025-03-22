@@ -36,7 +36,7 @@ function processParagraph(layer: Layer, paragraph: HTMLParagraphElement,
             try {
                 [_, r, g, b] = textColor.match(COLOR_REGEXP) || ["", "0", "0", "0"];
             } catch (e) {
-                console.debug(`O2X: error while matching color from ${textColor}`, e);
+                console.debug(`NEX: error while matching color from ${textColor}`, e);
             }
 
             let color;
